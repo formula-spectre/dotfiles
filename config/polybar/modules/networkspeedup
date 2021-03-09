@@ -1,0 +1,12 @@
+;https://github.com/jaagr/polybar/wiki/Module:-network
+type = internal/network
+interface = wlp3s0
+;interface = enp14s0
+;interface = enp4s0
+label-connected = "%upspeed:7%|"
+format-connected = <label-connected>
+format-connected-prefix = "["
+;format-connected-prefix-foreground = #FE522C
+format-connected-foreground = ${colors.foreground}
+format-connected-background = ${colors.background}
+;format-connected-underline = #62FF00

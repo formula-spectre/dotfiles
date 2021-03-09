@@ -1,0 +1,9 @@
+type = custom/script
+exec = ~/.config/polybar/scripts/slstatus
+interval = 2
+format-padding = 1
+format-foreground = ${colors.foreground}
+format-background = ${colors.background}
+;format-underline = #C1B93E
+format-prefix-foreground = #C1B93E
+label =[%output%]

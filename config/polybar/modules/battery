@@ -1,0 +1,24 @@
+;https://github.com/jaagr/polybar/wiki/Module:-battery
+[module/battery]
+type = internal/battery
+battery = BAT0
+adapter = AC0
+full-at = 99
+
+format-charging = <label-charging>
+label-charging = [: %percentage%% +]
+format-charging-foreground = ${colors.foreground}
+format-charging-background = ${colors.background}
+;format-charging-underline = #c7ae25
+
+format-discharging = <label-discharging>
+label-discharging =[:%percentage%% -]
+;format-discharging-underline = #c7ae25
+format-discharging-foreground = ${colors.foreground}
+format-discharging-background = ${colors.background}
+
+format-full-prefix-foreground = ${colors.foreground}
+;format-full-underline = ${colors.foreground}
+format-full-foreground = ${colors.foreground}
+format-full-background = ${colors.background}
+label-full = [:%percentage%%!]

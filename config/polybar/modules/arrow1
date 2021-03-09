@@ -1,0 +1,7 @@
+[module/arrow1]
+; grey to Blue
+type = custom/text
+content = "%{T2} %{T-}"
+content-font = 2
+content-foreground = #8d62a9
+content-background = #292d3e

@@ -1,0 +1,32 @@
+
+type = custom/menu
+
+format-foreground = ${colors.foreground}
+format-background = ${colors.background}
+
+menu-0-0 =[Browsers]
+menu-0-0-exec = #menu-apps.open.1
+menu-0-1 =[Emacs]
+menu-0-1-exec = #menu-apps.open.2
+
+
+
+menu-1-0 =[Librewolf]
+menu-1-0-exec = librewolf
+menu-1-1 =[Chromium]
+menu-1-1-exec = chromium
+menu-2-0 =[Doom  Emacs]
+menu-2-0-exec = emacs --with-profile doom
+menu-2-1 =[Vanilla emacs]
+menu-2-1-exec = emacs
+menu-2-3 =[Dired]
+menu-2-3-exec = emacsclient -c -a '' --eval '(dired nil)'
+menu-2-4 =[Eshell]
+menu-2-4-exec = emacsclient -c -a '' --eval '(eshell)'
+menu-2-5 =[mu4e]
+menu-2-5-exec = emacsclient -c -a '' --eval '(mu4e)'
+padding-left = 2
+padding-right = 2
+label-open =   
+label-close = exec:
+label-separator =|

@@ -1,0 +1,11 @@
+;https://github.com/jaagr/polybar/wiki/Module:-xwindow
+type = internal/xwindow
+
+; Available tokens:
+;   %title%
+; Default: %title%
+label = %title%
+label-maxlen = 25
+
+format-foreground = ${colors.foreground}
+format-background = ${colors.background}

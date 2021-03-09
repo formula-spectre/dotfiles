@@ -1,0 +1,13 @@
+;https://github.com/jaagr/polybar/wiki/Module:-cpu
+type = internal/cpu
+; Seconds to sleep between updates
+; Default: 1
+interval = 1
+format-foreground = ${colors.foreground}
+format-background = ${colors.background}
+
+label-font = 3
+format = <label>
+
+format-padding = 0
+label =[﬙ :%percentage%]

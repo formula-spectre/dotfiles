@@ -1,0 +1,8 @@
+;https://github.com/jaagr/polybar/wiki/Module:-memory
+type = internal/memory
+interval = 1
+label = %percentage_used%%
+
+format =[ :<label>]
+format-foreground = ${colors.foreground}
+format-background = ${colors.background}

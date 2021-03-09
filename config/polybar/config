@@ -1,0 +1,187 @@
+[global/wm]
+;https://github.com/jaagr/polybar/wiki/Configuration#global-wm-settings
+margin-top = 0
+margin-bottom = 0
+
+[settings]
+;https://github.com/jaagr/polybar/wiki/Configuration#application-settings
+throttle-output = 5
+throttle-output-for = 10
+screenchange-reload = true
+compositing-background = over
+compositing-foreground = over
+compositing-overline = over
+compositing-underline = over
+compositing-border = over
+
+; Define fallback values used by all module formats
+format-foreground = #FF0000
+format-background = #00FF00
+format-underline =
+format-overline =
+format-spacing =
+format-padding =
+format-margin =
+format-offset =
+
+[colors]
+; Nord theme ============
+background = #000000
+foreground = #f3f4f5
+alert = #d08770
+volume-min = #a3be8c
+volume-med = #ebcb8b
+volume-max = #bf616a
+; =======================
+
+
+################################################################################
+############                  bspwmbar for the monitor
+################################################################################
+
+[bar/bspwmbar-monitor]
+inherit = bar/bspwmbar
+monitor = DP2-3
+
+
+################################################################################
+############                  bspwmbar for the monitor
+################################################################################
+
+[bar/bspwmbar-monitor3]
+inherit = bar/bspwmbar
+monitor = DP2-1
+
+################################################################################
+############                  MAINBAR-BSPWM                         ############
+################################################################################
+
+[bar/bspwmbar]
+monitor = eDP1 
+width = 100%
+height = 20 
+;offset-x = 1%
+offset-y = 0.5%
+radius = 12.0
+fixed-center = true
+bottom = false
+;separator =|
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+;https://github.com/jaagr/polybar/wiki/Fonts
+font-0 = "JetBrains Mono Nerd Font:size=10;0"
+font-1 = "JetBrains Mono Nerd Font:size=10;0"
+font-2 = "JetBrains Mono Nerd Font:size=10;0"
+font-3 = "JetBrains Mono Nerd Font:size=10;0"
+
+line-size = 1
+line-color = #f00
+
+wm-restack = bspwm
+override-redirect = true
+
+; Enable support for inter-process messaging
+; See the Messaging wiki page for more details.
+enable-ipc = true
+
+border-size = 0
+border-color = #00000000
+
+padding-left = 0
+padding-right = 0
+
+module-margin-left = 0.5
+module-margin-right = 0.5
+
+#modules-left = menu-apps bspwm
+modules-left = bspwm
+modules-center = xwindow
+modules-right = battery networkspeedup networkspeeddown temperature memory cpu date
+
+tray-detached = false
+tray-offset-x = 0.5
+tray-offset-y = 0
+tray-padding = 0
+tray-maxsize = 20
+tray-scale = 1.0
+tray-position = right
+tray-background = ${colors.background}
+
+################################################################################
+############                       MODULES A-Z                      ############
+################################################################################
+
+
+[module/bspwm]
+include-file = ~/.config/polybar/modules/bspwm
+################################################################################
+
+[module/battery]
+include-file = ~/.config/polybar/modules/battery
+################################################################################
+
+[module/cpu]
+include-file = ~/.config/polybar/modules/cpu
+################################################################################
+
+[module/date]
+include-file = ~/.config/polybar/modules/date
+#################################################################
+
+[module/ewmh]
+include-file = ~/.config/polybar/modules/ewmh
+################################################################################
+
+[module/memory]
+include-file = ~/.config/polybar/modules/memory
+################################################################################
+
+[module/mpd]
+include-file = ~/.config/polybar/modules/mpd
+################################################################################
+
+[module/networkspeedup]
+include-file = ~/.config/polybar/modules/networkspeedup
+################################################################################
+
+[module/networkspeeddown]
+include-file = ~/.config/polybar/modules/networkspeeddown
+################################################################################
+
+[module/pavolume]
+include-file = ~/.config/polybar/modules/pavolume
+################################################################################
+
+[module/pub-ip]
+include-file = ~/.config/polybar/modules/pub-ip
+################################################################################
+
+[module/temperature]
+include-file = ~/.config/polybar/modules/temperature
+################################################################################
+
+[module/volume]
+include-file = ~/.config/polybar/modules/volume
+################################################################################
+
+[module/wired-network]
+include-file = ~/.config/polybar/modules/wired-network
+################################################################################
+
+[module/xbacklight]
+include-file = ~/.config/polybar/modules/xbacklight
+################################################################################
+
+[module/xwindow]
+include-file = ~/.config/polybar/modules/xwindow
+###############################################################################
+
+[module/menu-apps]
+include-file = ~/.config/polybar/modules/menu-apps
+###############################################################################
+
+[module/arrow1]
+include-file = ~/.config/polybar/modules/arrow1
+###############################################################################

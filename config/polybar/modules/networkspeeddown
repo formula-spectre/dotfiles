@@ -1,0 +1,9 @@
+;https://github.com/jaagr/polybar/wiki/Module:-network
+type = internal/network
+interface = wlp3s0
+label-connected = "%downspeed:7%]"
+format-connected = <label-connected>
+format-connected-prefix = ""
+format-connected-foreground = ${colors.foreground}
+format-connected-background = ${colors.background}
+;format-connected-underline = #62FF00
