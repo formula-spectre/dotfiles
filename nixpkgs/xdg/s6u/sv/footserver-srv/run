@@ -1,0 +1,6 @@
+#!/bin/execlineb -P
+envfile /etc/s6/config/user-services.conf
+importas -i XDG_RUNTIME_DIR XDG_RUNTIME_DIR
+importas -i LANG LANG
+fdmove -c 2 1
+foot -Ss -p3

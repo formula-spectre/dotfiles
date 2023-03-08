@@ -1,0 +1,6 @@
+#!/bin/execlineb -P
+backtick -E USER { id -un }
+s6-envdir /home/${USER}/.config/s6u/envdir/
+importas HOME HOME
+importas DISPLAY DISPLAY
+fdmove -c 2 1  sxhkd

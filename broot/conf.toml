@@ -1,0 +1,3 @@
+[[verbs]]
+key = "Ctrl-N"
+internal = ":line_down"

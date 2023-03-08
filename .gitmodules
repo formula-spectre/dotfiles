@@ -1,0 +1,9 @@
+[submodule "emacs"]
+	path = emacs
+	url = https://github.com/hlissner/doom-emacs
+[submodule "emacs-profiles/doom-emacs"]
+	path = emacs-profiles/doom-emacs
+	url = https://github.com/hlissner/doom-emacs
+[submodule "emacs-profiles/spacemacs"]
+	path = emacs-profiles/spacemacs
+	url = https://github.com/syl20bnr/spacemacs

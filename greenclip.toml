@@ -1,0 +1,14 @@
+
+[greenclip]
+  blacklisted_applications = []
+  enable_image_support = true
+  history_file = "/home/doctor-sex/.cache/greenclip.history"
+  image_cache_directory = "/tmp/greenclip"
+  max_history_length = 50
+  max_selection_size_bytes = 0
+  trim_space_from_selection = true
+  use_primary_selection_as_input = false
+  static_history = [
+ '''Science isn't about WHY. It's about WHY NOT. Why is so much of our science dangerous? Why not marry safe science if you love it so much. In fact, why not invent a special safety door that won't hit you on the butt on the way out, because you are fired.''',
+ ''' doas eix-sync && doas emerge --ask --verbose --update --newuse --deep --complete-graph=y --with-bdeps=y --backtrack=50 @world && doas smart-live-rebuild && doas emerge --depclean --with-bdeps=y && doas eix-update'''
+  ]

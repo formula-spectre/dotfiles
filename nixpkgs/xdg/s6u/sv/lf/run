@@ -1,0 +1,2 @@
+#!/bin/execlineb -P
+fd-move -c 2 1 lf -server

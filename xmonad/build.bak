@@ -1,0 +1,12 @@
+#!/bin/sh
+export XMONAD_CACHE_DIR=/home/${USER}/.cache/xmonad
+export XMONAD_CONFIG_HOME=/home/${USER}/.config/xmonad
+export XMONAD_DATA_DIR=/home/${USER}/.local/share/xmonad
+
+exec stack ghc --  \
+  --make xmonad.hs \
+  -i               \
+  -ilib            \
+  -fforce-recomp   \
+  -main-is main    \
+  -o "$1"

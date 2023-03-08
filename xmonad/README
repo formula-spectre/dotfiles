@@ -1,0 +1,29 @@
+Personal Xmonad dotfiles
+optional dependencies:
+-Slock (to lock screen)
+-Ydotool (if you want to be able to click onto workspaces)
+-Xmobar (status bar obv)
+-light (brightness control)
+-maim for screenshot, flameshot as secondary tool for ss (for screeshots)
+at the moment i'm using spectacle because flameshot is broken beyond comprehension on artix
+
+the Theme module is not mine, all credits to the creator, Joan Milev
+I added termonad and sx as submodule for ease of use, so I can have everything in one place. to pull the submodules, use this command:
+git clone --recurse-submodules https://gitlab.com/Spektrum-Interface/xmonad-dotfiles.git
+or
+git submodule update --init
+
+the submodules/other-works/xmonad-* submodules are other users's configs, I have them as submodules so I can easily pull and study them to integrate them in my configs
+
+
+I made the configs more portable, but these variables need to be set:
+cat << EOF >> ~/.zshenv
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XMONAD_CONFIG_HOME="$XDG_CONFIG_HOME/xmonad"
+export XMONAD_DATA_DIR="$XDG_DATA_HOME/xmonad"
+export XMONAD_CACHE_DIR="$XDG_CACHE_HOME/xmonad"
+EOF
+substitute .zshenv with your shell's file
+or don't, i'm not a doctor

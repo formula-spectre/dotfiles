@@ -1,0 +1,5 @@
+#!/bin/execlineb -P
+backtick -E USER { id -un }
+s6-envdir /home/${USER}/.config/s6u/envdir
+importas DISPLAY DISPLAY
+fdmove -c 2 1 trayer --edge top --align right --widthtype request --padding 6 --SetDockType true --SetPartialStrut true --expand true --transparent true --alpha 0 --tint black --height 18 --distance 1 --monitor primary

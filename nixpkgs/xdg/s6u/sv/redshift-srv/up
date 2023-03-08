@@ -1,0 +1,3 @@
+#!/bin/execlineb -P
+envfile /etc/s6/config/user-services.conf
+fdmove -c 2 1 redshift -P -O 2500

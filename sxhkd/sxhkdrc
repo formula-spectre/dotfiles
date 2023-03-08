@@ -1,0 +1,43 @@
+XF86Launch1:
+ redshift -xP -O 2500
+
+#super + XF86Launch1:
+#    ~/.local/bin/dock.sh
+
+XF86TaskPane:
+ ~/.local/bin/dock.sh
+
+XF86Eject:
+ ~/.local/bin/dock.sh
+
+super + i
+ sh ~/.config/xmonad/scripts/greenclip-menu
+
+XF86RotateWindows:
+ ~/.local/bin/flipscreen flip
+
+XF86MonBrightnessUp:
+ light -A 10
+
+XF86MonBrightnessDown:
+ light -U 10
+
+XF86AudioMicMute:
+ amixer set Capture toggle
+
+XF86AudioMute
+ amixer set Master toggle
+
+XF86Audio{Raise,Lower}Volume
+ amixer set Master {10%+,10%-}
+
+Print
+ maim -s | xclip -selection clipboard -t image/png
+
+alt + l:
+ slock
+alt + space:
+ xdotool click 2
+
+super + F1:
+ ~/.local/bin/monitor.sh

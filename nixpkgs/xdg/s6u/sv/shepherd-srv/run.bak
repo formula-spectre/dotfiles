@@ -1,0 +1,5 @@
+#!/bin/execlineb -P
+envfile /etc/s6/config/user-services.conf
+importas XDG_RUNTIME_DIR XDG_RUNTIME_DIR
+foreground { install -d -o ${USER} -g ${USER} ${XDG_RUNTIME_DIR}/shepherd }
+s6-fghack shepherd -I --socket ${XDG_RUNTIME_DIR}/shepherd/socket

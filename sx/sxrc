@@ -1,0 +1,12 @@
+xinput disable $(xinput | grep Finger | grep -oP "id=\K..")
+s6-rc -l /tmp/${USER}/s6-rc -u change default xorg-bundle
+redshift -P -O 2500
+#exec xmonad 
+#   continue
+# done
+
+# emacsclient -c
+xrdb ~/.Xresources
+#dbus-run-session emacs -f exwm-enable
+exec dbus-run-session emacs -f exwm-enable 
+pkill trayer

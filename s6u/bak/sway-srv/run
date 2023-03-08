@@ -1,0 +1,10 @@
+#!/bin/execlineb -P
+fdmove -c 2 1
+unexport WAYLAND_DISPLAY
+multisubstitute
+{
+	importas -i HOME HOME
+}
+cd $HOME
+unexport ?
+sway

@@ -1,0 +1,633 @@
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# OPTIONS_GHC -Wall -Werror -O2 #-}
+
+module Main (main) where
+ -- Base
+import           System.Environment                  (getEnv)
+import           System.Exit                         (exitSuccess)
+import           System.IO.Unsafe                    (unsafeDupablePerformIO)
+import           XMonad
+import qualified XMonad.StackSet                     as W
+
+
+-- Actions
+import           XMonad.Actions.CopyWindow           (kill1)
+import           XMonad.Actions.CycleWS              (nextScreen, prevScreen)
+import qualified XMonad.Actions.FlexibleResize       as Flex
+
+import           XMonad.Actions.Promote
+import           XMonad.Actions.RotSlaves            (rotSlavesDown)
+import           XMonad.Actions.Search               (duckduckgo,
+                                                      promptSearchBrowser)
+import           XMonad.Actions.ShowText
+import           XMonad.Actions.Submap
+import           XMonad.Actions.WithAll              (sinkAll)
+
+    -- Data
+-- import Data.Maybe                                  (fromJust)
+import           Data.List                           (intercalate)
+import qualified Data.Map                            as M
+import           Data.Monoid
+
+    -- Hooks
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.ManageDocks            (AvoidStruts,
+                                                      ToggleStruts (..),
+                                                      avoidStruts, docks,
+                                                      manageDocks)
+import           XMonad.Hooks.ManageHelpers          (doFullFloat, isFullscreen)
+import           XMonad.Hooks.SetWMName
+import           XMonad.Hooks.StatusBar              (StatusBarConfig,
+                                                      dynamicSBs,
+                                                      statusBarPropTo)
+-- import XMonad.Hooks.ServerMode
+import           XMonad.Hooks.EwmhDesktops           (ewmh)
+import           XMonad.Hooks.WindowSwallowing
+
+    -- Layouts
+import           XMonad.Layout.LayoutModifier
+import           XMonad.Layout.ResizableTile
+import           XMonad.Layout.SimplestFloat
+import           XMonad.Layout.Tabbed
+import           XMonad.Layout.WindowNavigation      (Navigate (Go),
+                                                      WindowNavigation,
+                                                      windowNavigation)
+--import qualified XMonad.Layout.LimitWindows  as LW        (limitWindows, LimitWindows)
+import           XMonad.Layout.IndependentScreens
+import           XMonad.Layout.MultiToggle           (EOT (EOT), mkToggle, (??))
+import qualified XMonad.Layout.MultiToggle           as MT (HCons, MultiToggle,
+                                                            Toggle (..))
+import           XMonad.Layout.MultiToggle.Instances (StdTransformers (NBFULL, NOBORDERS))
+import           XMonad.Layout.NoBorders             (SmartBorder, WithBorder,
+                                                      noBorders, smartBorders,
+                                                      withBorder)
+import           XMonad.Layout.Renamed
+import           XMonad.Layout.Spacing
+import qualified XMonad.Layout.ToggleLayouts         as T (ToggleLayouts,
+                                                           toggleLayouts)
+import           XMonad.Layout.WindowArranger        (WindowArranger)
+
+   -- Utilities
+import           XMonad.Util.NamedScratchpad
+import           XMonad.Util.Run                     (safeSpawn, safeSpawnProg,
+                                                      unsafeSpawn)
+import           XMonad.Util.SpawnOnce
+
+
+--prompt
+import           Graphics.X11.ExtraTypes.XF86        (xF86XK_AudioLowerVolume,
+                                                      xF86XK_AudioMicMute,
+                                                      xF86XK_AudioMute,
+                                                      xF86XK_AudioRaiseVolume,
+                                                      xF86XK_Display,
+                                                      xF86XK_MonBrightnessDown,
+                                                      xF86XK_MonBrightnessUp)
+import           XMonad.Prompt
+import           XMonad.Prompt.ConfirmPrompt         (confirmPrompt)
+import           XMonad.Prompt.FuzzyMatch            (fuzzyMatch, fuzzySort)
+import           XMonad.Prompt.Window
+--import           Graphics.X11.Xlib.Extras            (Event (ConfigureEvent))
+import Control.Monad (filterM)
+
+myModMask, altMask :: KeyMask
+myModMask = mod4Mask        -- Sets modkey to super/windows key
+altMask = mod1Mask          -- Sets altMask to the alt key
+
+myTerminal :: String
+myTerminal    = "termonad"                              -- Sets default terminal
+
+myLocker :: String
+myLocker      = "slock"                                 -- Set lockscreen
+
+myNormColor :: String
+myNormColor   = grey                                   -- Border color of normal windows
+
+myFocusColor :: String
+myFocusColor  = white                                   -- Border color of focused windows
+
+myFontName,myFontType,myFont' :: String
+myFontName    = "Iosevka Nerd Font Mono"                -- defines the font name
+myFontType    = "regular"                               -- defines the font's type, like regular, italic..
+myFont'       = "xft:" <> myFontName <> ":" <> myFontType <> ":size=9:antialias=true:hinting=true" --Set the chosen font to xft and so on.
+-- The ' is necessary in case I use the module Theme.Theme, which has a variable named myFont
+
+myBorderWidth :: Dimension
+myBorderWidth = 3                               -- Sets border width for windows
+
+xmonadConfigHome :: String
+xmonadConfigHome = unsafeDupablePerformIO (getEnv "XMONAD_CONFIG_HOME") --get $XMONAD_CONFIG_HOME from system env
+
+-- Define some (non) COLORS. (I know it's greyscale but noncolors sounded like a better joke)
+black,  grey,  white, orange :: String
+black  = "#000000"
+grey   = "#525d6a"
+white  = "#FFFFFF"
+orange = "#ffbb49"
+
+myXmobarPP' :: PP
+myXmobarPP' = filterOutWsPP [scratchpadWorkspaceTag] $ def
+  {
+      ppOrder   = \[ws,l,_] -> [ws,l]
+    , ppCurrent = xmobarColor white "" . wrap "[" "]"                   -- Current workspace
+    , ppVisible = xmobarColor white "" . wrap "" "^"  -- Visible but not current workspace
+    , ppHidden  = xmobarColor white "" . wrap "" ""   -- Hidden workspaces (no windows)
+    , ppUrgent = xmobarColor orange "" . wrap "!" "!"                   -- Urgent workspace
+   }
+
+xmobarInt,xmobarExt :: StatusBarConfig
+xmobarInt    = statusBarPropTo "_XMONAD_LOG_0" (xmonadConfigHome <> "/xmobar/xmobar0 -x 0") (pure myXmobarPP') --xmobar on screen 0
+xmobarExt    = statusBarPropTo "_XMONAD_LOG_1" (xmonadConfigHome <> "/xmobar/xmobar1 -x 1") (pure myXmobarPP') --xmobar on screen 1
+
+myXmobar :: 
+
+barSpawner' :: ScreenId -> IO StatusBarConfig
+barSpawner' 0 = pure $ xmobarInt -- <> xmobarSecInt
+barSpawner' 1 = pure $ xmobarExt -- <> xmobarSecExt
+barSpawner' _ = mempty -- nothing on the rest of the screens
+
+mySwallowEventHook :: Event -> X All
+mySwallowEventHook =
+  swallowEventHook (className =? "Termonad"
+                    <||> className =? "termonad-linux-x86_64"
+                    <||> className =? "Termonad-linux-x86_64")
+  (return True) -- <+> fullscreenEventHook
+
+main :: IO ()
+main =  do
+    nScreens <- countScreens
+    --define xmonad itself
+    xmonad . ewmh . docks . dynamicSBs barSpawner' $ def
+      { manageHook         = myManageHook <+> manageDocks
+      , handleEventHook    = myHandleEventHook
+      , modMask            = myModMask
+      , startupHook        = myStartupHook
+      , terminal           = myTerminal
+      , keys               = keybinds
+      , layoutHook         = myLayoutHook
+      , workspaces         = withScreens nScreens myWorkspaces
+      , borderWidth        = myBorderWidth
+      , normalBorderColor  = myNormColor
+      , focusedBorderColor = myFocusColor
+      , mouseBindings      = myMouseBindings
+
+      }
+
+myHandleEventHook :: Event -> X All
+myHandleEventHook =
+  handleTimerEvent
+  <+> mySwallowEventHook
+  -- <+> fullscreenEventHook
+  <+> trayerDockEventHook
+  where
+    trayerDockEventHook :: Event -> X All
+    trayerDockEventHook ConfigureEvent {ev_window, ev_above} | ev_above == none =
+      do
+        whenX
+          (runQuery (className =? "trayer") ev_window)
+          (ev_window `stackAbove` "xmobar")
+        mempty
+    trayerDockEventHook _ = mempty
+
+    stackAbove :: Window -> String -> X ()
+    w `stackAbove` appname =
+      withDisplay $ \dpy -> do
+        rootw <- asks theRoot
+        (_, _, ws) <- io (queryTree dpy rootw)
+        let ws' = dropWhile (w /=) ws
+        xmobarWs <- filterM (runQuery (appName =? appname)) ws'
+        mapM_ (io . lowerWindow dpy) xmobarWs
+
+
+systray :: X () --systray kill and restart function, thanks to nixbox
+systray = spawn $
+  intercalate " ; " [killTray, execTray]
+  where
+    killTray =
+      intercalate
+        " | "
+        [ "ps --no-headers -o pid,command -C trayer",
+          "awk '/\\<trayer .*SetDockType true\\>/ { print $1 }'",
+          "xargs --no-run-if-empty kill 2>/dev/null"
+        ]
+    execTray =
+      unwords $
+        "exec" :
+        [ "trayer",
+          "--edge top",
+          "--align right",
+          "--widthtype request",
+          "--padding 6",
+          "--SetDockType true",
+          "--SetPartialStrut true",
+          "--expand true",
+          "--monitor 1",
+          "--transparent true",
+          "--alpha 0",
+          "--tint '" ++ black ++ "'",
+          "--height 22",
+          "--distance 1",
+          "&" -- <-needed? perhaps
+        ]
+        --rationale behind this: when docking, the tray stays on screen0, but my main screen is screen1, this restart tray so it spawns on screen1.
+        --also, in case tray gets stuck or has bugs, a simple restart of xmonad fixes that
+
+
+
+fehBg :: X()
+fehBg = spawn $
+ unwords $
+  "/bin/sh" :
+    [ "$HOME/.fehbg" ]
+
+primaryMonitor,secondaryMonitor :: String
+primaryMonitor = "LVDS-1"
+secondaryMonitor = "HDMI-2"
+
+singleMon :: X()
+singleMon = do
+  {spawn singleMonCmd; fehBg; systray}
+  where
+    singleMonCmd =
+      unwords $
+        "xrandr":
+          [
+            "--output " ++ primaryMonitor,
+            "--mode 1366x768",
+            "--pos 0x156",
+            "--rotate normal",
+            "--output HDMI-2 --off"
+          ]
+
+
+dualMon :: X()
+dualMon = do
+  {spawn dualMonCmd; fehBg; systray}
+  where
+    dualMonCmd =
+      unwords $
+        "xrandr":
+          [
+            "--output " ++ primaryMonitor,
+            "--mode 1366x768",
+            "--pos 0x156",
+            "--rotate normal",
+            "--output " ++ secondaryMonitor ++ " --primary",
+            "--mode 1920x1080",
+            "--pos 1366x0",
+            "--rotate normal"
+          ]
+
+--the rationale behind {single,dual}Mon is... well,docking and undocking. it resets the wallpaper and tray, while executing xrandr.
+
+
+--this is the startup hook. take a guess at what it does
+myStartupHook :: X ()
+myStartupHook = do
+    systray
+    fehBg
+    spawnOnce "sh -c \"echo >&3\"" --this is needed if you manage to make xorg and xmonad supervised by s6.. good luck with that
+    setWMName "LG3D"
+
+
+-- define a custom XPrompt
+myXPConfig :: XPConfig
+myXPConfig = def {
+                   font                = myFont'
+                 , bgColor             = black
+                 , fgColor             = white
+                 , bgHLight            = white
+                 , fgHLight            = black
+                 , borderColor         = white
+                 , promptBorderWidth   = 1
+                 , promptKeymap        = defaultXPKeymap
+                 , position            = CenteredAt 0.3 0.3
+                 , alwaysHighlight     = True           -- Disables tab cycle
+                 , height              = 30
+                 , maxComplRows        = Just 10        -- set to 'Just 5' for 5 rows
+                 , historySize         = 0
+--                 , historyFilter       = deleteAllDuplicates
+                 , defaultText         = []
+                 , showCompletionOnTab = False          -- False means auto completion
+                 , searchPredicate     = fuzzyMatch
+                 , sorter              = fuzzySort
+                 }
+
+--scratchpad(s).
+myScratchPads :: [NamedScratchpad]
+myScratchPads = [
+                 NS "pcmanfm" spawnFm findFm manageFm,
+                 NS "alacritty" spawnTerm findTerm manageTerm
+                ]
+  where
+    --pcmanfm scratchpad
+    spawnFm = "pcmanfm"
+    findFm = title =? "pcmanfm"
+    manageFm = customFloating $ W.RationalRect l t w h
+              where
+                h = 0.9
+                w = 0.5
+                t = 0.95 -h
+                l = 0.98 -w
+    spawnTerm = "alacritty -t alascratchpad"
+    findTerm  = title =? "alascratchpad"
+    manageTerm = customFloating $ W.RationalRect l t w h
+                   where
+                     h = 0.8
+                     w = 0.5
+                     t = 0.85 -h
+                     l = 0.50 -w
+
+-- this mySpacing function does not apply borders if there is only one window
+mySpacing' :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a
+mySpacing' i = spacingRaw True (Border i i i i) True (Border i i i i) True
+
+
+-- Defining a bunch of layouts
+-- limitWindows n sets maximum number of windows displayed for layout.
+-- mySpacing n sets the gap size around the windows.
+rn :: String -> l a -> ModifiedLayout Rename l a
+rn n = renamed [Replace n]
+
+
+type SmartBorders      a = ModifiedLayout SmartBorder a
+type WindowNavigation' a = ModifiedLayout WindowNavigation a
+type Spacing'          a = ModifiedLayout Spacing a
+type Rename'           a = ModifiedLayout Rename a
+type WindowArranger'   a = ModifiedLayout WindowArranger a
+type AvoidStruts'      a = ModifiedLayout AvoidStruts a
+
+--type ToggleLayouts     lt lf a = ModifiedLayout T.ToggleLayouts lt lf a
+
+type Layouts a
+  = Rename'
+    (SmartBorders
+        (WindowNavigation' (Spacing' a )))
+    Window
+
+tall :: Layouts ResizableTall
+monocle :: Layouts Full
+
+floats :: Rename'
+           (SmartBorders
+              (WindowNavigation'
+                 (Spacing' ( WindowArranger' SimplestFloat))))
+           Window
+
+tall     = rn "tall"
+           $ smartBorders
+           $ windowNavigation
+           $ mySpacing' 4
+           $ ResizableTall 1(3/100) (1/2) []
+monocle  = rn "monocle"
+           $ smartBorders
+           $ windowNavigation
+           $ mySpacing' 4
+           $ Full
+floats   = rn "floats"
+           $ smartBorders
+           $ windowNavigation
+           $ mySpacing' 4
+           $ simplestFloat
+
+
+myLayoutHook :: AvoidStruts'
+                  (T.ToggleLayouts
+                     (Rename'
+                        (SmartBorders
+                           (WindowNavigation' (Spacing' (WindowArranger' SimplestFloat)))))
+                     (MT.MultiToggle
+                        (MT.HCons StdTransformers (MT.HCons StdTransformers EOT))
+                        (WindowNavigation'
+                           (Choose
+                              (ModifiedLayout
+                                 WithBorder
+                                 (Rename'
+                                    (SmartBorders
+                                       (WindowNavigation' (Spacing' ResizableTall)))))
+                              (ModifiedLayout
+                                 WithBorder
+                                 (ModifiedLayout
+                                    Rename
+                                    (SmartBorders (WindowNavigation' (Spacing' Full)))))))))
+                  Window
+
+
+myLayoutHook = avoidStruts
+               . T.toggleLayouts floats
+               . mkToggle (NBFULL ?? NOBORDERS ?? EOT)
+               $ windowNavigation myDefaultLayout
+  where
+               myDefaultLayout =  withBorder myBorderWidth tall
+                                 ||| noBorders monocle
+
+
+s6Ctrl :: [Char] -> String -> X ()
+s6Ctrl sv nm =
+  unsafeSpawn ( ("s6-rc -l /tmp/" <> unsafeDupablePerformIO ( getEnv "USER" ) <> "/s6-rc")  ++ ( " -" ++ sv ) ++ " change " ++ nm )
+
+
+--I think this is self explanatory
+myWorkspaces :: [[Char]]
+myWorkspaces =  ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+
+
+myManageHook :: XMonad.Query (Data.Monoid.Endo WindowSet)
+myManageHook = composeAll
+     -- 'doFloat' forces a window to float.  Useful for dialog boxes and such.
+     -- using 'doShift ( myWorkspaces !! 7)' sends program to workspace 8, because indexing is fun
+     [ className =? "confirm"         --> doFloat
+     , className =? "mpv"             --> doFloat
+     , className =? "xmonad help"     --> doFloat
+     , className =? "toolbar"         --> doFloat
+     , className =? "xmessage"        --> doFloat
+     , className =? "Xmessage"        --> doFloat
+     , isFullscreen -->  doFullFloat
+     ] <+> namedScratchpadManageHook myScratchPads
+
+--keybindings
+keybinds :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
+keybinds conf@XConfig { XMonad.modMask = modm } =
+  M.fromList
+    $  [
+    --xmonad control
+         --restart xmonad
+         ((modm .|. shiftMask, xK_r), safeSpawn "xmonad" ["--restart"]),
+          --recompile xmonad
+         ((modm .|. controlMask, xK_r),safeSpawn "xmonad" [ "--recompile"]),
+         --exit xmonad
+         ((modm .|. shiftMask, xK_q),   confirmPrompt myXPConfig "quit" $ (s6Ctrl "d" "xorg-bundle")  >> io exitSuccess),
+
+    --useful stuff to have binded
+         ((modm, xK_Return), safeSpawnProg myTerminal),
+         --spawn a terminal
+         ((modm, xK_p), (unsafeSpawn "dmenu_run -c -l 6")),
+         --run prompt
+         ((altMask, xK_o), promptSearchBrowser myXPConfig browser duckduckgo),
+         --search on the internet!
+         ((altMask, xK_l), (safeSpawnProg (myLocker))),
+         --lock screen
+
+    -- Scripts
+         ((modm .|. shiftMask, xK_p), (unsafeSpawn (xmonadConfigHome <> "/scripts/dmusick"))),
+         --dmusick, a yt music playing script.. which as of lately, is not working
+         --vim anywhere script, my own spork
+         ((altMask, xK_i), (unsafeSpawn (xmonadConfigHome <> "/scripts/greenclip-menu"))),
+         --greenclip rofi/dmenu menu
+         ((modm, xK_Right), (dualMon)),
+         --dual monitor setup
+         ((modm, xK_Down), (singleMon)),
+         --single monitor for when I undock. I know these are not scripts but functions. I don't care. this is my config and I put things wherever I please thank you
+
+    -- Kill windows
+         --kill window
+         ((modm .|. shiftMask, xK_c), (kill1)),
+         -- monitor focusing
+         ((modm, xK_comma), (nextScreen)),
+         -- Switch focus to next monitor
+         ((modm, xK_period), (prevScreen)),
+         -- Switch focus to prev monitor
+         --((altMask, xK_space), pasteSelection),
+         ((altMask, xK_space), (safeSpawn "ydotool" (["click", "middle"]))),
+         --((modm .|. shiftMask, xK_space), unsafeSpawn "ydotool key ctrl+shift+c &&  xclip -o | plumb -i"),
+    --window shifting to next ws (maybe useless?)
+    --     ((modm .|. shiftMask, xK_period), shiftTo Next nonNSP >> moveTo Next nonNSP),          -- Shifts focused window to next ws
+    --     ((modm .|. shiftMask, xK_comma), shiftTo Prev nonNSP >> moveTo Prev nonNSP),           -- Shifts focused window to prev ws
+
+    -- Grid select, control G + g for app grid, t for goto window
+         ((modm, xK_space), submap .  M.fromList $
+           [
+            ((0, xK_a),          (windowPrompt myXPConfig Goto wsWindows )),
+            ((0, xK_s),          (namedScratchpadAction myScratchPads "pcmanfm")),
+            ((0, xK_Return),     (namedScratchpadAction myScratchPads "alacritty")),
+            ((0, xK_d),          (windowPrompt myXPConfig Bring allWindows)),
+            ((0,xK_f),           (safeSpawn "emacsclient" (["-c", "-a", "\"emacs\""]))),
+            ((0, xK_j),          (safeSpawn "emacs" (["--with-profile","vanilla"]))),
+            ((0, xK_k),          (safeSpawnProg "keepassxc")),
+            ((0, xK_t),          (safeSpawnProg "telegram-desktop")),
+            ((0, xK_c),          (safeSpawnProg "brave")),
+            ((0, xK_w),          (safeSpawnProg "whatsdesk"))
+           ]),
+           --no comments, because there is already the helper that says what each button does
+    -- Floating windows
+         ((modm, xK_t), (withFocused $ windows . W.sink)),
+         --Push floating window back to tile
+         ((modm .|. shiftMask, xK_t), (sinkAll)),
+         --Push ALL floating windows to tile
+
+         ((modm, xK_x), (flashText def 1 "service management" >> (submap . M.fromList $
+                                                                  [
+                                                                    ((0,xK_b), (flashText def 1 "birdtray" >> (submap . M.fromList $
+                                                                                                               [
+                                                                                                                 ((0,xK_u), s6Ctrl "u" "birdtray"),
+                                                                                                                 ((0,xK_d), s6Ctrl "d" "birdtray")
+                                                                                                               ]))),
+                                                                    ((0,xK_p), (flashText def 1 "pipewire" >> (submap . M.fromList $
+                                                                                                               [
+                                                                                                                 ((0,xK_u), s6Ctrl "u" "pipewire-bundle"),
+                                                                                                                 ((0,xK_d), s6Ctrl "d" "pipewire-bundle")
+                                                                                                                 {-
+                                                                                                                 ((0,xK_r), (flashText def 1 "restart" submap . M.fromList $
+                                                                                                                             [
+                                                                                                                               ((0,xK_p), (unsafeSpawn "s6-svc -r /tmp/${USER}/service/pw-srv " >> flashtext def 1 "pipewire restarted"))
+
+                                                                                                                             ]
+                                                                                                                            )) -}
+                                                                                                               ]
+                                                                                                              )))
+                                                                  ]))),
+    -- Increase/decrease spacing (gaps)
+         ((controlMask .|. altMask, xK_j), (decWindowSpacing (4))),
+         --Decrease window spacing
+         ((controlMask .|. altMask, xK_k), (incWindowSpacing (4))),
+         --Increase window spacing
+
+    -- Window navigation
+         ((modm, xK_m), (windows W.focusMaster)),
+         -- Move focus to the master window
+         ((modm, xK_l), (windows W.focusDown)),
+         -- Move focus down
+         ((modm, xK_h), (windows W.focusUp)),
+         --Move focus up
+         ((modm,  xK_BackSpace), (promote)),
+         -- Moves focused window to master, others maintain order
+
+         ((modm, xK_k), (sendMessage $ Go U)),
+         --Move focus Up
+         ((modm, xK_j), (sendMessage $ Go D)),
+         --Move focus Down
+         --((modm .|. shiftMask, xK_m), windows W.swapMaster),
+         --Swap the focused window and the master window,
+         ((modm .|. shiftMask, xK_Tab), (rotSlavesDown)),
+         --Rotate all windows except master and keep focus in place
+         --((modm .|. controlMask, xK_Tab), rotAllDown),
+         --Rotate all the windows in the current stack
+         ((modm .|. shiftMask, xK_l), (sendMessage Expand)),
+         --expand horizontally
+         ((modm .|. shiftMask, xK_h), (sendMessage Shrink)),
+         --shrink horizontally
+         ((modm .|. shiftMask, xK_j), (sendMessage MirrorShrink)),
+         -- Shrink vert window widthn
+         ((modm .|. shiftMask, xK_k), (sendMessage MirrorExpand)),
+         --Expand vert window width
+
+    -- Layouts
+         ((modm, xK_Tab), (sendMessage NextLayout)),
+         --Switch to next layout
+         ((modm, xK_f), (sendMessage (MT.Toggle NBFULL) >> sendMessage ToggleStruts)),
+         --Toggles noborder/full
+
+
+    -- Increase/decrease windows in the master pane or the stack
+         ((modm .|. shiftMask, xK_Up), (sendMessage (IncMasterN (1)))),
+         -- Increase # of clients master pane
+         ((modm .|. shiftMask, xK_Down), (sendMessage (IncMasterN (-1)))),
+         -- Decrease # of clients master pane
+
+    -- media keys
+         ((0, xF86XK_MonBrightnessUp), (safeSpawn "light" ["-A", "10"])),
+         --increase backlight
+         ((0, xF86XK_MonBrightnessDown), (safeSpawn "light" ["-U","10"])),
+         --decrease backlight
+         ((0, xF86XK_Display), safeSpawnProg "arandr"),
+         --spawn arandr
+         ((0, xF86XK_AudioMicMute), (safeSpawn "amixer" ["set","Capture","toggle"])),
+         --mute mic
+         ((0, xF86XK_AudioMute), (safeSpawn "amixer" ["set","Master","toggle"])),
+         --mute main speaker
+         ((0,xF86XK_AudioRaiseVolume), (safeSpawn "amixer" ["set", "Master", "10%+"])),
+         --raise volume
+         ((0,xF86XK_AudioLowerVolume), (safeSpawn "amixer" ["set", "Master", "10%-"])),
+         --lower volume
+         ((0, xK_Print), (unsafeSpawn ("maim -s | xclip -selection clipboard -t image/png"))),
+         --screenshot
+         ((modm, xK_Print), (safeSpawn "spectacle" ["-r"]))
+         --screenshot, but with flameshot
+      ]
+    ++
+
+    [((m .|. modm, k), windows $ onCurrentScreen f i)
+        | (i, k) <- zip (workspaces' conf) [xK_1 .. xK_9]
+        , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
+    ++
+       --
+       --mod + either comma or period to switch screen focus, add shift to move the window to the next or prev monitor
+       --
+       [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+       | (key, sc) <- zip [xK_period, xK_comma] [0 ..]
+       , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
+       ]
+  where
+    browser :: String
+    browser = "brave"
+
+myMouseBindings :: XConfig l -> M.Map (KeyMask, Button) (Window -> X ())
+myMouseBindings XConfig { XMonad.modMask = modm } = M.fromList
+  -- mod-button1, Set the window to floating mode and move by dragging
+  [
+   ((modm, button1), \w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster),
+  -- mod-button2, Raise the window to the top of the stack
+   ((modm, button2), \w -> focus w >> windows W.shiftMaster),
+  -- mod-button3, Set the window to floating mode and resize by dragging
+    ((modm, button3) , \w -> focus w >> Flex.mouseResizeWindow w >> windows W.shiftMaster)
+  ]

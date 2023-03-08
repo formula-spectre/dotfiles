@@ -1,0 +1,3 @@
+#!/bin/execlineb -P
+s6-envdir /home/doctor-sex/.config/s6u/envdir
+exec udiskie --tray

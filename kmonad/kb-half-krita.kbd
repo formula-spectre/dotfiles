@@ -1,0 +1,30 @@
+(defcfg
+  ;; Linux
+  input  (device-file "/dev/input/by-id/usb-Gaming_KB_Gaming_KB-event-kbd")
+  output (uinput-sink "KMonad output")
+  fallthrough true)
+
+(defsrc
+  esc    f1 f2 f3 f4 f5
+  grv  1    2    3    4    5    6
+  tab  q    w    e    r    t
+  caps  a    s    d    f    g
+  lsft   z    x    c    v    b
+  lctl lmet lalt          spc)
+
+
+
+(defalias
+  zin #(C-+)
+  zout #(C--)
+  undo #(C-z)
+  rotr #(C-[)
+  rotl #(C-]))
+
+(deflayer qwerty
+  esc      f1   f2   f3   f4   f5
+  grv  @zout  @zin    [   ]   @rotr @rotl
+  tab  q    w    e     r      t
+  caps a    s    d    f    g
+  lsft  @undo    x    c   v    b
+  lctl lmet lalt           spc      )

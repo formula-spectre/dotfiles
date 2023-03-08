@@ -1,0 +1,16 @@
+print
+    maim -s | xclip xclip -selection clipboard -t image/png
+xf86monbrightnessup
+    light -A 10
+xf86monbrightnessdown
+    light -U 10
+xf86audiomicmute
+    amixer set Capture toggle
+xf86audiomute
+    amixer set Master toggle
+
+xf86audioraisevolume
+    amixer set Master 10%+
+
+xf86audiolowervolume
+    amixer set Master 10%-

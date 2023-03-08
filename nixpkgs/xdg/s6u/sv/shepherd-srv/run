@@ -1,0 +1,4 @@
+#!/bin/execlineb -P
+envfile /etc/s6/config/user-services.conf
+importas XDG_RUNTIME_DIR XDG_RUNTIME_DIR
+exec s6-fghack /usr/local/bin/shepherd
