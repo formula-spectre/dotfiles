@@ -12,26 +12,29 @@
 #           NIX_CFLAGS_COMPILE = "${oldflags} ${newflags}";
 #         });
 #in
+let
+  _user = builtins.getEnv "USER";
+in
 {
   #imports = [
   #  ./s6.nix
   #  ];
 
   home = {
-    username = "doctor-sex";
-    homeDirectory = "/home/doctor-sex";
+    username = "${_user}";
+    homeDirectory = "/home/${_user}";
     stateVersion = "22.05";
     # sessionPath = [
-    #   "/home/doctor-sex/.config/emacs/bin"
-    #   "/home/doctor-sex/.nix-profile/bin/"
-    #   "/home/doctor-sex/.local/bin"
+    #   "/home/${_user}/.config/emacs/bin"
+    #   "/home/${_user}/.nix-profile/bin/"
+    #   "/home/${_user}/.local/bin"
     #];
     sessionVariables = {
-      NIX_PATH="/home/doctor-sex/.nix-defexpr/channels";
-      #PATH="$PATH:/home/doctor-sex/.nix-profile/bin/:/home/doctor-sex/.local/bin/";
+      NIX_PATH="/home/${_user}/.nix-defexpr/channels";
+      #PATH="$PATH:/home/${_user}/.nix-profile/bin/:/home/${_user}/.local/bin/";
       TERM="xterm";
       BROWSER="firefox";
-      XDG_CONFIG_HOME="/home/doctor-sex/.config";
+      XDG_CONFIG_HOME="/home/${_user}/.config";
       ZSH_COMPDUMP = "${config.xdg.cacheHome}/zsh/zcompdump";
       EMACSDIR = "${config.xdg.configHome}/emacs";
       DOOMDIR = "${config.xdg.configHome}/doom.d";

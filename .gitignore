@@ -122,3 +122,5 @@ quicklisp/*
 zsh.nix
 xmonad/.stack*
 xmonad/.stack-work
+xmonad/lib/Theme/*.hi
+xmonad/lib/Theme/*.o
