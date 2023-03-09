@@ -4,13 +4,17 @@
   output (uinput-sink "KMonad output")
   fallthrough true)
 
+
 (defsrc
-       f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12  home end ins
-  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
-  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
-  caps  a    s    d    f    g    h    j    k    l    ;    '    ret
-  lsft   102d z    x    c    v    b    n    m    ,    .    /    rsft
-  lctl lmet lalt          spc           ralt   cmp   rctl)
+  esc  mute vold volu                          prnt slck pause ins del  home pgup
+       f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11   f12      end  pgdn
+  grv  1    2    3    4    5    6    7    8    9    0    -     =        bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [     ]        ret
+  caps a    s    d    f    g    h    j    k    l    ;    '     \
+  lsft 102d z    x    c    v    b    n    m    ,    .    /              rsft
+  wkup lctl lmet lalt           spc            ralt cmps rctl      back up   fwd
+                                                                   left down rght
+)
 
 (defalias
   hyp C-A-S-M
@@ -19,8 +23,8 @@
   ctsh (tap-next esc lctl)
   ;;;; god mode alias definitions
   ;; layer switch commands
-  lysw1  (layer-switch godmode)
-  lysw2  (layer-switch qwerty)
+
+
   ;; upper row
   gt    C-t
   gp    M-p
@@ -51,20 +55,12 @@
 
 
 (deflayer qwerty
-       f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12  home end ins
-  grv  1    2    3     4      5    6    7    8    9    0    -    =    bspc
-  tab  q    w    e     r      t    y    u    i    o    p    [    ]    \
-  @ctsh  a    s    d    f    g    h    j    k    l    ;    '    ret
-  @lp @lysw1 z    x    c     v      b    n    m    ,    .    /    @rp
-  " lalt lmet            spc           ralt prnt rctl)
-
-
-
-(deflayer godmode
-       _    _    _    _    _    _    _     _    _     _    _    _    _ _ _
-  _    _    _    _    _    _    _    _     _    _     _    _    _    _
-  _    _    _    _    _    _    _    _     up    _     _    _    _    _
-  _    _    _    _    _    _    _    left down right  _    _    _
-  _   @lysw2  _    _        _    _    _    _    _     _    _     _    _
-  _    _    _              _              _    _    _
+  esc  mute vold volu                          prnt slck pause ins del  home pgup
+       f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11   f12      end  pgdn
+  grv  1    2    3    4    5    6    7    8    9    0    -     =        bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [     ]        ret
+  @ctsh a    s    d    f    g    h    j    k    l    ;    '     \
+  @lp 102d z    x    c    v    b    n    m    ,    .    /              @rp
+  wkup @hyp lalt lmet           spc            ralt cmps rctl      back up   fwd
+                                                                   left down rght
 )
