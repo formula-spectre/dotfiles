@@ -1,40 +1,23 @@
- { config, lib, pkgs, ... }:
-# let
-#   optimizeWithFlags = pkg: flags:
-#     pkgs.lib.overrideDerivation pkg (old:
-#       let
-#         newflags = pkgs.lib.foldl' (acc: x: "${acc} ${x}") "" flags;
-#         oldflags = if (pkgs.lib.hasAttr "NIX_CFLAGS_COMPILE" old)
-#                    then "${old.NIX_CFLAGS_COMPILE}"
-#                    else "";
-#       in
-#         {
-#           NIX_CFLAGS_COMPILE = "${oldflags} ${newflags}";
-#         });
-#in
-let
-  _user = builtins.getEnv "USER";
-in
+{ config, lib, pkgs, ... }:
+ let
+   _users = builtins.getEnv "USER";
+   in
 {
-  #imports = [
-  #  ./s6.nix
-  #  ];
-
   home = {
-    username = "${_user}";
-    homeDirectory = "/home/${_user}";
+    username = "doctor-sex";
+    homeDirectory = "/home/doctor-sex";
     stateVersion = "22.05";
     # sessionPath = [
-    #   "/home/${_user}/.config/emacs/bin"
-    #   "/home/${_user}/.nix-profile/bin/"
-    #   "/home/${_user}/.local/bin"
+    #   "/home/doctor-sex/.config/emacs/bin"
+    #   "/home/doctor-sex/.nix-profile/bin/"
+    #   "/home/doctor-sex/.local/bin"
     #];
     sessionVariables = {
-      NIX_PATH="/home/${_user}/.nix-defexpr/channels";
-      #PATH="$PATH:/home/${_user}/.nix-profile/bin/:/home/${_user}/.local/bin/";
+      NIX_PATH="/home/doctor-sex/.nix-defexpr/channels";
+      #PATH="$PATH:/home/doctor-sex/.nix-profile/bin/:/home/doctor-sex/.local/bin/";
       TERM="xterm";
       BROWSER="firefox";
-      XDG_CONFIG_HOME="/home/${_user}/.config";
+      XDG_CONFIG_HOME="/home/doctor-sex/.config";
       ZSH_COMPDUMP = "${config.xdg.cacheHome}/zsh/zcompdump";
       EMACSDIR = "${config.xdg.configHome}/emacs";
       DOOMDIR = "${config.xdg.configHome}/doom.d";
@@ -92,7 +75,13 @@ in
   programs = {
     direnv = {
       enable = true;
-        nix-direnv.enable = true;
+      nix-direnv.enable = true;
+    };
+    emacs = {
+      enable = true;
+      # package = pkgs.emacs.overrideAttrs (attrs: {
+      #   configureFlags = (attrs.configureFlags or [])++ ["--without-sound --without-sound --without-gameuser"];
+      #});
     };
     home-manager.enable = true;
     starship = {
@@ -113,8 +102,30 @@ in
       enable = true;
     extensions = with pkgs.nur.repos.rycee.firefox-addons;
       [
-        ublock-origin
+        add-custom-search-engine
+        anonaddy
+        browserpass
+        canvasblocker
+        clearurls
+        cookie-autodelete
         darkreader
+        decentraleyes
+        disconnect
+        duckduckgo-privacy-essentials
+        enhancer-for-youtube
+        # etag-stoppa?
+        # firefox-relay?
+        # hide-tabs?
+        # minerblock?
+        privacy-settings
+        sidebery
+        snowflake
+        sponsorblock
+        tab-session-manager
+        temporary-containers
+        terms-of-service-didnt-read
+        vimium
+        xbrowsersync
       ];
     profiles.default = {
       id = 0;
