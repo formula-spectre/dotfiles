@@ -1,3 +1,3 @@
 #!/bin/execlineb -P
-envfile /etc/s6/config/user-services.conf
+s6-envdir ../../envdir
 fdmove -c 2 1 greenclip daemon

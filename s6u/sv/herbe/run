@@ -1,6 +1,5 @@
 #!/bin/execlineb -P
-backtick -E USER { id -un }
-         s6-envdir /home/${USER}/.config/s6u/envdir
+         s6-envdir ../../envdir
          importas DISPLAY DISPLAY
          pipeline { jq --unbuffered ".summary,.body" }
                   forstdin-E  $notfi

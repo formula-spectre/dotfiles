@@ -1,5 +1,5 @@
 #!/bin/execlineb -P
 #redirfd -w 1 /dev/null wireplumber
-envfile /etc/s6/config/user-services.conf
+s6-envdir ../../envdir
 
 fdmove -c 2 1 wireplumber
