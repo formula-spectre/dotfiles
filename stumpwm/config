@@ -1,0 +1,40 @@
+;; load quicklisp
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames ".local/share/quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
+
+
+;; change the prefix key to something else
+(set-prefix-key (kbd "s-c"))
+(which-key-mode)
+
+;; make focus follow mouse
+(setf *mouse-focus-policy* :sloppy)
+
+;; define a custom keymap
+(defvar *my-application-keymap*
+  (let ((m (make-sparse-keymap)))
+    (define-key m (kbd "p") "exec")
+    (define-key m (kbd "l") "exec librewolf")
+
+  m))
+
+
+
+(define-key *root-map* (kbd "x") '*my-application-keymap*)
+(define-key *root-map* (kbd "1") "remove-split")
+(define-key *root-map* (kbd "2") "vsplit")
+(define-key *root-map* (kbd "3") "hsplit")
+(define-key *root-map* (kbd "0") "remove-split")
+(define-key *root-map* (kbd "SPC") "exec kermit")
+
+
+(define-key *top-map* (kbd "s-h") "move-focus left")
+(define-key *top-map* (kbd "s-j") "move-focus down")
+(define-key *top-map* (kbd "s-k") "move-focus up")
+(define-key *top-map* (kbd "s-l") "move-focus right")
+(define-key *top-map* (kbd "s-p") "exec")
+(define-key *top-map* (kbd "s-RET") "exec kermit")
+(define-key *top-map* (kbd "s-r") "loadrc")
