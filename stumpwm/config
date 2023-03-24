@@ -1,3 +1,5 @@
+;; -*-Lisp-*-
+
 ;; load quicklisp
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames ".local/share/quicklisp/setup.lisp"
@@ -7,7 +9,7 @@
 
 
 ;; change the prefix key to something else
-(set-prefix-key (kbd "s-c"))
+(set-prefix-key (kbd "s-x"))
 (which-key-mode)
 
 ;; make focus follow mouse
@@ -20,6 +22,35 @@
     (define-key m (kbd "l") "exec librewolf")
 
   m))
+;; modeline configuration
+
+
+
+(setf *mode-line-timeout* "1")
+(setf *time-modeline-string* "%b %a %d (%H:%M:%S)")
+(setf *group-format* "%t"
+      *window-format* "%n: %30t")
+
+(setf *screen-mode-line-format*
+      (list
+       (format nil "~D" (substitute #\Space #\Newline (run-shell-command "xprop -root -notype -f WM_NAME '8u' | grep WM_NAME | cut -d= -f2"  t)))
+       ))
+
+
+(set-module-dir "/usr/share/stumpwm/contrib")
+(load-module "stumptray")
+(stumptray::stumptray)
+
+(defvar *background* "#000000")
+(defvar *foreground* "#FFFFFF")
+
+(setf *time-modeline-string* "%a %b %e %k:%M")
+(setf *mode-line-timeout* 2)
+(setf *mode-line-background-color* *background*)
+(setf *mode-line-foreground-color* *foreground*)
+(setf *mode-line-border-color* *foreground*)
+(setf *mode-line-border-width* 0)
+(enable-mode-line (current-screen) (current-head) t)
 
 
 
@@ -28,6 +59,7 @@
 (define-key *root-map* (kbd "2") "vsplit")
 (define-key *root-map* (kbd "3") "hsplit")
 (define-key *root-map* (kbd "0") "remove-split")
+
 (define-key *root-map* (kbd "SPC") "exec kermit")
 
 
@@ -38,3 +70,4 @@
 (define-key *top-map* (kbd "s-p") "exec")
 (define-key *top-map* (kbd "s-RET") "exec kermit")
 (define-key *top-map* (kbd "s-r") "loadrc")
+(define-key *top-map* (kbd "s-:") "eval")
