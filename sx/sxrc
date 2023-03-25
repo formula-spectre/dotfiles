@@ -7,6 +7,6 @@ redshift -P -O 2500
 
 # emacsclient -c
 xrdb ~/.Xresources
-#dbus-run-session emacs -f exwm-enable
-exec dbus-run-session emacs -f exwm-enable 
+dbus-run-session /usr/bin/emacs -f exwm-enable
+#exec dbus-run-session emacs -f exwm-enable 
 pkill trayer
