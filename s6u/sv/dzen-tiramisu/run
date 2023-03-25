@@ -1,0 +1,8 @@
+#!/bin/sh
+
+aslstatus -s | dzen2 -p -h 18 -ta l -w 390 -fn 'Iosevka Nerd Font' &
+tiramisu -o "#sourceNEW_LABEL#summaryNEW_LABEL#body" |
+    while read -r noti; do
+      echo "$noti" | sed 's/NEW_LABEL/\ /g' | cut -c1-50
+      herbe "$(echo "$noti" | sed 's/NEW_LABEL/\n/g')" &
+    done | dzen2 -p -h 18 -ta l -w 390 -fn 'Iosevka Nerd Font' -x 400 -e 'button1=exec:killall herbe'&

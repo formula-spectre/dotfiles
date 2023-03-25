@@ -1,0 +1,7 @@
+#!/bin/execlineb -P
+#backtick -E USER { id -un } s6-envdir /home/${USER}/.config/s6u/envdir
+#envfile /etc/s6/config/user-services.conf
+backtick -E USER { id -un }
+s6-envdir /home/${USER}/.config/s6u/envdir/
+importas DISPLAY DISPLAY
+pipeline -d { aslstatus -s } dzen2 -p -h 18 -ta l -w 390 -fn "Iosevka Nerd Font"

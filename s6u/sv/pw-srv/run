@@ -1,5 +1,5 @@
 #!/bin/execlineb -P
 #redirfd -w 1 /dev/null pipewire
-s6-envdir ../../envdir
+backtick -E USER { id -un } s6-envdir /home/${USER}/.config/s6u/envdir
 
 fdmove -c 2 1 pipewire

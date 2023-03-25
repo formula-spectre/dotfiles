@@ -36,6 +36,7 @@
 (define-key *root-map* (kbd "2") "vsplit")
 (define-key *root-map* (kbd "3") "hsplit")
 (define-key *root-map* (kbd "0") "remove-split")
+(define-key *root-map* (kbd "l") "move-window right")
 
 
 (define-key *top-map* (kbd "s-RET") "exec emacsclient -ce '(+vterm/here \"~/\")'")
