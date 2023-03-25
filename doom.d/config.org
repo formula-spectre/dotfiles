@@ -433,8 +433,8 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
                            (exwm-workspace-switch-create ,i))))
                      (number-sequence 0 9))))
 
-     (exwm-input-set-key (kbd "s-<return>")  #'eshell)
-     (exwm-input-set-key (kbd "s-SPC") (lambda ()
+     (exwm-input-set-key (kbd "s-SPC")  #'eshell)
+     (exwm-input-set-key (kbd "s-<return>") (lambda ()
                                          (interactive)
                                          (+vterm/here "~/")))
 

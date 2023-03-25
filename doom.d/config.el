@@ -218,50 +218,29 @@
               (lambda ()
                 (ibuffer-switch-to-saved-filter-groups "default")))
 
-(require 'portage)
-(require 'magentoo)
-
 (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
 
-(cl-macrolet ((bwrapper (file &optional (title file))
-                `(lambda () (interactive)
-                   (start-process-shell-command
-                    ,title nil (expand-file-name ,file "~/.local/bin/"))))
-              (start (name)
-                     `(lambda () (interactive)
-                        (start-process ,name nil ,name))))
- (map! :leader
-       (:desc "split window below" "2" #'split-window-below)
-       (:desc "split window right" "3" #'split-window-right)
+(map! :leader
+      (:desc "split window below" "2" #'split-window-below)
+      (:desc "split window right" "3" #'split-window-right)
 
-       (:prefix-map ("m" . "mode")
-                    (:desc "enable text mode"      "t" #'text-mode)
-                    (:desc "enable org mode"       "o" #'org-mode)
-                    (:desc "enable writeroom mode" "w" #'writeroom-mode)
-                    (:desc "enable elisp mode"     "e" #'emacs-lisp-mode)
-                    (:desc "enable god mode"       "g" #'god-mode))
-       (:prefix-map ("b" . "buffer")
-                    (:desc "new buffer"            "n" #'+default/new-buffer)
-                    (:desc "kill this buffer"      "k" #'kill-this-buffer))
-       (:prefix-map ("t" . "toggle")
-                    (:prefix-map ("t" . "telega")
-                                 (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
-                                 ;(:desc "start telega"       "t" #'telega)
-                                 (:desc "telega chat with"   "c" #'telega-chat-with)
-                                 (:desc "kill telega"        "q" #'telega-kill)))
-       (:prefix-map ("M-p" . "portage")
-                    )
-       (:prefix-map ("x" . "X11 applications")
-                    (:desc "brave wrapped"         "b" (bwrapper "brave"))
-                    (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
-                    (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
-                    (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
-                    (:desc "discord wrapped"       "d" (bwrapper "discord"))
-                    (:desc "element wrapped"       "e" (bwrapper "element-desktop" "element"))
-                    (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
-                    (:desc "librewolf unwrapped"   "l" (start "librewolf"))
-       )
-       ))
+      (:prefix-map ("m" . "mode")
+                   (:desc "enable text mode"      "t" #'text-mode)
+                   (:desc "enable org mode"       "o" #'org-mode)
+                   (:desc "enable writeroom mode" "w" #'writeroom-mode)
+                   (:desc "enable elisp mode"     "e" #'emacs-lisp-mode)
+                   (:desc "enable god mode"       "g" #'god-mode))
+      (:prefix-map ("b" . "buffer")
+                   (:desc "new buffer"            "n" #'+default/new-buffer)
+                   (:desc "kill this buffer"      "k" #'kill-this-buffer))
+      (:prefix-map ("t" . "toggle")
+                   (:prefix-map ("t" . "telega")
+                                (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
+                                ;(:desc "start telega"       "t" #'telega)
+                                (:desc "telega chat with"   "c" #'telega-chat-with)
+                                (:desc "kill telega"        "q" #'telega-kill)))
+      (:prefix-map ("M-p" . "portage")
+                   ))
 
 (global-set-key (kbd "C-\\") #'undo)
 
@@ -299,100 +278,117 @@
 
     (exwm-floating-move (- pos-x) (- pos-y))))
 
-(use-package exwm
-  :config
-  ;; Set the default number of workspaces
-  (setq exwm-workspace-number 9)
+ (use-package exwm
+   :config
+   ;; Set the default number of workspaces
+   (setq exwm-workspace-number 9)
 
-  ;; When window "class" updates, use it to set the buffer name
-  (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+   ;; When window "class" updates, use it to set the buffer name
+   (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
 
-  ;; When window title updates, use it to set the buffer name
-  (add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
+   ;; When window title updates, use it to set the buffer name
+   (add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
 
-  ;; Configure windows as they're created
-  ;(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
+   ;; Configure windows as they're created
+   ;(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
 
-  ;; When EXWM starts up, do some extra confifuration
-  (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+   ;; When EXWM starts up, do some extra confifuration
+   (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
 
-  ;; NOTE: Uncomment the following two options if you want window buffers
-  ;;       to be available on all workspaces!
+   ;; NOTE: Uncomment the following two options if you want window buffers
+   ;;       to be available on all workspaces!
 
-  ;; Automatically move EXWM buffer to current workspace when selected
-  (setq exwm-layout-show-all-buffers t)
+   ;; Automatically move EXWM buffer to current workspace when selected
+   (setq exwm-layout-show-all-buffers t)
 
-  ;; Display all EXWM buffers in every workspace buffer list
-  (setq exwm-workspace-show-all-buffers t)
+   ;; Display all EXWM buffers in every workspace buffer list
+   (setq exwm-workspace-show-all-buffers t)
 
-  ;; NOTE: Uncomment this option if you want to detach the minibuffer!
-  ;; Detach the minibuffer (show it with exwm-workspace-toggle-minibuffer)
-  ;;(setq exwm-workspace-minibuffer-position 'top)
+   ;; NOTE: Uncomment this option if you want to detach the minibuffer!
+   ;; Detach the minibuffer (show it with exwm-workspace-toggle-minibuffer)
+   ;;(setq exwm-workspace-minibuffer-position 'top)
 
-  ;; Set the screen resolution (update this to be the correct resolution for your screen!)
-  (require 'exwm-randr)
-  (exwm-randr-enable)
+   ;; Set the screen resolution (update this to be the correct resolution for your screen!)
+   (require 'exwm-randr)
+   (exwm-randr-enable)
 
-  ;; This will need to be updated to the name of a display!  You can find
-  ;; the names of your displays by looking at arandr or the output of xrandr
-     (setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1"
-                                                1 "HDMI-2"
-                                                2 "HDMI-2"
-                                                3 "HDMI-2"
-                                                4 "HDMI-2"
-                                                5 "VGA1-1"
-                                                6 "LVDS-1"
-                                                7 "LVDS-1"
-                                                8 "LVDS-1"
-                                                9 "LVDS-1"))
-  ;; Automatically send the mouse cursor to the selected workspace's display
-  (setq exwm-workspace-warp-cursor t)
+   ;; This will need to be updated to the name of a display!  You can find
+   ;; the names of your displays by looking at arandr or the output of xrandr
+      (setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1"
+                                                 1 "HDMI-2"
+                                                 2 "HDMI-2"
+                                                 3 "HDMI-2"
+                                                 4 "HDMI-2"
+                                                 5 "VGA1-1"
+                                                 6 "LVDS-1"
+                                                 7 "LVDS-1"
+                                                 8 "LVDS-1"
+                                                 9 "LVDS-1"))
+   ;; Automatically send the mouse cursor to the selected workspace's display
+   (setq exwm-workspace-warp-cursor t)
 
-  ;; Window focus should follow the mouse pointer
-  (setq mouse-autoselect-window t
-        focus-follows-mouse t)
+   ;; Window focus should follow the mouse pointer
+   (setq mouse-autoselect-window t
+         focus-follows-mouse t)
 
-  ;; Ctrl+Q will enable the next key to be sent directly
-  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+   ;; Ctrl+Q will enable the next key to be sent directly
+   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
 
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-        `(
-          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-          ([?\s-r] . exwm-reset)
+   ;; Set up global key bindings.  These always work, no matter the input state!
+   ;; Keep in mind that changing this list after EXWM initializes has no effect.
+   (setq exwm-input-global-keys
+         `(
+           ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+           ([?\s-r] . exwm-reset)
 
-          ;; Move between windows
-           ([?\s-h] . windmove-left)
-           ([?\s-l] . windmove-right)
-           ([?\s-k] . windmove-up)
-           ([?\s-j] . windmove-down)
-           ([?\s-H] . shrink-window-horizontally)
-           ([?\s-L] . enlarge-window-horizontally)
+           ;; Move between windows
+            ([?\s-h] . windmove-left)
+            ([?\s-l] . windmove-right)
+            ([?\s-k] . windmove-up)
+            ([?\s-j] . windmove-down)
+            ([?\s-H] . shrink-window-horizontally)
+            ([?\s-L] . enlarge-window-horizontally)
 
-          ;; Launch applications via shell command
-          ([?\s-p] . (lambda (command)
-                       (interactive (list (read-shell-command "$ ")))
-                       (start-process-shell-command command nil command)))
+           ;; Launch applications via shell command
+           ([?\s-p] . (lambda (command)
+                        (interactive (list (read-shell-command "$ ")))
+                        (start-process-shell-command command nil command)))
 
-          ;; Switch workspace
-          ([?\s-w] . exwm-workspace-switch)
-          ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-          ([?\s-v] . +vterm/toggle)
-          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))))
+           ;; Switch workspace
+           ([?\s-w] . exwm-workspace-switch)
+           ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+           ([?\s-v] . +vterm/toggle)
+           ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+           ,@(mapcar (lambda (i)
+                       `(,(kbd (format "s-%d" i)) .
+                         (lambda ()
+                           (interactive)
+                           (exwm-workspace-switch-create ,i))))
+                     (number-sequence 0 9))))
 
-    (exwm-input-set-key (kbd "s-<return>")  #'eshell)
-    (exwm-input-set-key (kbd "s-SPC") (lambda ()
-                                        (interactive)
-                                        (+vterm/here "~/")))
+     (exwm-input-set-key (kbd "s-SPC")  #'eshell)
+     (exwm-input-set-key (kbd "s-<return>") (lambda ()
+                                         (interactive)
+                                         (+vterm/here "~/")))
 
-  )
+     (cl-macrolet ((bwrapper (file &optional (title file))
+                        `(lambda () (interactive)
+                           (start-process-shell-command
+                            ,title nil (expand-file-name ,file "~/.local/bin/"))))
+                   (start (name)
+                          `(lambda () (interactive)
+                             (start-process ,name nil ,name))))
+                          (map! :leader
+                         (:prefix-map ("x" . "X11 applications")
+                                      (:desc "brave wrapped"         "b" (bwrapper "brave"))
+                                      (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
+                                      (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
+                                      (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
+                                      (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
+                                      (:desc "librewolf unwrapped"   "l" (start "librewolf"))
+                                      ))
+                   )
+)
 
 ;; (setq telega-server-libs-prefix "/usr")
  (add-hook 'telega-load-hook 'telega-notifications-mode)

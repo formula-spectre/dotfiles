@@ -130,3 +130,6 @@ xmonad/lib/Theme/*.o
 /xmonad/xmobar/xmobar-emacs.hi
 /xmonad/xmobar/xmobar-emacs.o
 /yi/.stack-work/
+/xmobar/xmobar
+/xmobar/xmobar.hi
+/xmobar/xmobar.o
