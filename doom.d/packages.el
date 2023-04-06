@@ -12,8 +12,8 @@
 (package! vterm)
 (package! ement)
 (package! org-caldav)
-;;(package! telega)
-;;(package! pdf-tools)
+(package! telega)
+(package! pdf-tools)
 (package! w3m)
 ;(package! neotree)
 ;(package! exwm)
@@ -21,11 +21,13 @@
 ;(package! mu4e)
 ;(package! cyberpunk-theme)
 ;(package! wand)
-
-
+(package! hydra)
+(package! avy)
 ;(package! feebleline)
 ;(package! autothemer)
-
+(package! frog-jump-buffer)
+(package! polymode)
+(package! poly-org)
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
