@@ -20,7 +20,7 @@ config =
         concatMap
           fontWrap
           [ myFont
-          , "xft:Iosevka Nerd Font:italic:pixelsize=12:antialias=true:hinting=true"
+          , "Iosevka Nerd Font 12"
           ]
     , additionalFonts =
         [ "xft:Iosevka Nerd Font:size=12"

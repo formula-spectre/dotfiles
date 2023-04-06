@@ -133,3 +133,6 @@ xmonad/lib/Theme/*.o
 /xmobar/xmobar
 /xmobar/xmobar.hi
 /xmobar/xmobar.o
+termonad/termonad
+termonad/termonad.hi
+termonad/termonad.o

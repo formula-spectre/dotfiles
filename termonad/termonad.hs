@@ -96,7 +96,7 @@ greyscale =
 
 fontConf =
   defaultFontConfig
-    { fontFamily = "LispM Nerd Font"
+    { fontFamily = "Iosevka Nerd Font"
     , fontSize = FontSizePoints 10
     }
 
