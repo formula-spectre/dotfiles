@@ -171,7 +171,8 @@
 ;; change `org-directory'. It must be set before org loads!
  (setq org-directory "~/org/")
 
-(load! (concat (getenv "DOOMDIR") "/private"))
+(when (file-exists-p (concat "DOOMDIR" "/private.el"))
+                     (load! (concat (getenv "DOOMDIR") "/private")))
 
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
  (use-package mu4e
@@ -205,31 +206,111 @@
 (setq circe-reduce-lurker-spam t)
 (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
 
-(require 'ibuffer)
-(setq ibuffer-saved-filter-groups
-      '(("telega"
-         (or (mode . telega-chat-mode)
-             (mode . telega-root-mode)))
-        ("Directories"
-         (mode . dired-mode))
-        ("EXM"
-         (mode . exwm-mode))))
-(add-hook 'ibuffer-mode-hook
-              (lambda ()
-                (ibuffer-switch-to-saved-filter-groups "default")))
+(use-package frog-jump-buffer :ensure t)
+(unbind-key (kbd "C-x C-b"))
+(global-set-key (kbd "C-x C-b") #'frog-jump-buffer)
+(global-set-key (kbd "C-x b") #'ibuffer)
+(setq frog-jump-buffer-use-all-the-icons-ivy t)
+(dolist (regexp '("^\\*Native-compile-log" "^\\*Async-native-compile-log" "^\\*Messages"))
+  (push regexp frog-jump-buffer-ignore-buffers))
+
+(when (string= "gentoo" (doom-system-distro))
+(require 'portage)
+(require 'magentoo))
 
 (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
 
-(map! :leader
-      (:desc "split window below" "2" #'split-window-below)
-      (:desc "split window right" "3" #'split-window-right)
+(defhydra hydra-window (global-map "C-x")
+   "
+Movement^^        ^Split^         ^Switch^		^Resize^
+----------------------------------------------------------------
+_h_ ←       	_v_ertical    	_b_uffer		_q_ X←
+_j_ ↓        	_x_ horizontal	_f_ind files	_w_ X↓
+_k_ ↑        	_z_ undo      	_a_ce 1		_e_ X↑
+_l_ →        	_Z_ reset      	_s_wap		_r_ X→
+_F_ollow		_D_lt Other   	_S_ave		max_i_mize
+_SPC_ cancel	_o_nly this   	_d_elete
+"
+   ("h" windmove-left )
+   ("j" windmove-down )
+   ("k" windmove-up )
+   ("l" windmove-right )
+   ("q" hydra-move-splitter-left)
+   ("w" hydra-move-splitter-down)
+   ("e" hydra-move-splitter-up)
+   ("r" hydra-move-splitter-right)
+   ("b" helm-mini)
+   ("f" helm-find-files)
+   ("F" follow-mode)
+   ("a" (lambda ()
+          (interactive)
+          (ace-window 1)
+          (add-hook 'ace-window-end-once-hook
+                    'hydra-window/body))
+       )
+   ("v" (lambda ()
+          (interactive)
+          (split-window-right)
+          (windmove-right))
+       )
+   ("x" (lambda ()
+          (interactive)
+          (split-window-below)
+          (windmove-down))
+       )
+   ("s" (lambda ()
+          (interactive)
+          (ace-window 4)
+          (add-hook 'ace-window-end-once-hook
+                    'hydra-window/body)))
+   ("S" save-buffer)
+   ("d" delete-window)
+   ("D" (lambda ()
+          (interactive)
+          (ace-window 16)
+          (add-hook 'ace-window-end-once-hook
+                    'hydra-window/body))
+       )
+   ("o" delete-other-windows)
+   ("i" ace-maximize-window)
+   ("z" (progn
+          (winner-undo)
+          (setq this-command 'winner-undo))
+   )
+   ("Z" winner-redo)
+   ("SPC" nil)
+   )
 
-      (:prefix-map ("m" . "mode")
-                   (:desc "enable text mode"      "t" #'text-mode)
-                   (:desc "enable org mode"       "o" #'org-mode)
-                   (:desc "enable writeroom mode" "w" #'writeroom-mode)
-                   (:desc "enable elisp mode"     "e" #'emacs-lisp-mode)
-                   (:desc "enable god mode"       "g" #'god-mode))
+(defhydra hydra-god-mode (:body-pre (message "god mode started")
+                                  :post     (message "god mode exited."))
+  "god mode"
+  ("p" previous-line)
+  ("n" next-line)
+  ("b" backward-char)
+          ("f" forward-char)
+          ("a" doom/backward-to-bol-or-indent)
+          ("e" doom/forward-to-last-non-comment-or-eol)
+          ("j" electric-newline-and-maybe-indent)
+          ("k" kill-line)
+          ("o" open-line)
+          ("ga" beginning-of-buffer)
+          ("ge" end-of-buffer)
+          ("q" nil "quit"))
+
+(defhydra hydra-modes ( :color pink :exit t)
+  "various major modes"
+  ("t" text-mode "text mode")
+  ("o" org-mode "org mode")
+  ("w" writeroom-mode "writeroom mode")
+  ("e" emacs-lisp-mode "elisp mode")
+  ("g" hydra-god-mode/body "activate hydra-god-mode")
+  ("q" nil "quit"))
+
+(map! :leader
+      (:desc "modes" "m" #'hydra-modes/body)
+      ;(:desc "split window below" "2" #'split-window-below)
+      ;(:desc "split window right" "3" #'split-window-right)
+
       (:prefix-map ("b" . "buffer")
                    (:desc "new buffer"            "n" #'+default/new-buffer)
                    (:desc "kill this buffer"      "k" #'kill-this-buffer))

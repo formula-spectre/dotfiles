@@ -4,20 +4,20 @@
    in
 {
   home = {
-    username = "doctor-sex";
-    homeDirectory = "/home/doctor-sex";
+    username = "formula";
+    homeDirectory = "/home/formula";
     stateVersion = "22.05";
     # sessionPath = [
-    #   "/home/doctor-sex/.config/emacs/bin"
-    #   "/home/doctor-sex/.nix-profile/bin/"
-    #   "/home/doctor-sex/.local/bin"
+    #   "/home/formula/.config/emacs/bin"
+    #   "/home/formula/.nix-profile/bin/"
+    #   "/home/formula/.local/bin"
     #];
     sessionVariables = {
-      NIX_PATH="/home/doctor-sex/.nix-defexpr/channels";
-      #PATH="$PATH:/home/doctor-sex/.nix-profile/bin/:/home/doctor-sex/.local/bin/";
+      NIX_PATH="/home/formula/.nix-defexpr/channels";
+      #PATH="$PATH:/home/formula/.nix-profile/bin/:/home/formula/.local/bin/";
       TERM="xterm";
       BROWSER="firefox";
-      XDG_CONFIG_HOME="/home/doctor-sex/.config";
+      XDG_CONFIG_HOME="/home/formula/.config";
       ZSH_COMPDUMP = "${config.xdg.cacheHome}/zsh/zcompdump";
       EMACSDIR = "${config.xdg.configHome}/emacs";
       DOOMDIR = "${config.xdg.configHome}/doom.d";
