@@ -1,1 +1,1 @@
-/home/doctor-sex/.nix-profile/bin:/etc/profiles/per-user/doctor-sex/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/home/doctor-sex/.config/doom-emacs/bin:/home/doctor-sex/.local/share/junest/bin:/home/doctor-sex/.cabal/bin:/home/doctor-sex/.ghcup/bin:/home/doctor-sex/.local/bin
+/home/formula/.nix-profile/bin:/etc/profiles/per-user/formula/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/home/formula/.config/doom-emacs/bin:/home/formula/.local/share/junest/bin:/home/formula/.cabal/bin:/home/formula/.ghcup/bin:/home/formula/.local/bin

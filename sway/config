@@ -52,8 +52,8 @@ gaps outer 4
 # resumed. It will also lock your screen before your computer goes to sleep.
 exec autotiling -w 1 2 3 4 5 6 7 8 9
 exec  mkdir -p /tmp/${USER}/service
-exec s6-rc-init -c ${HOME}/.config/s6u/rc/compiled -l /tmp/doctor-sex/s6-rc /tmp/doctor-sex/service &
-exec s6-rc -l /tmp/doctor-sex/s6-rc -u change default wayland
+exec s6-rc-init -c ${HOME}/.config/s6u/rc/compiled -l /tmp/formula/s6-rc /tmp/formula/service &
+exec s6-rc -l /tmp/formula/s6-rc -u change default wayland
 
 ### Input configuration
 #

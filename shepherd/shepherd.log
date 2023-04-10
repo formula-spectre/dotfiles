@@ -10727,11 +10727,11 @@
 2022-07-22 12:28:21 Service kdeconnectd has been started.
 2022-07-22 12:28:21 Service kdeconnect-indicator has been started.
 2022-07-22 12:28:21 Service nix-daemon has been started.
-2022-07-22 12:41:23 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
+2022-07-22 12:41:23 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
 2022-07-22 12:41:23 Service pipewire has been started.
-2022-07-22 12:41:41 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-22 12:41:41 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-22 12:41:41 Service pipewire-pulse has been started.
-2022-07-22 12:41:45 Loading /home/doctor-sex/.config/shepherd/init.d/wireplumber.scm.
+2022-07-22 12:41:45 Loading /home/formula/.config/shepherd/init.d/wireplumber.scm.
 2022-07-22 12:41:45 Service wireplumber has been started.
 2022-07-22 12:42:00 Service pipewire has been started.
 2022-07-22 12:43:59 Loading .config/shepherd/init.d/pipewire.scm.
@@ -10755,10 +10755,10 @@
 2022-07-22 12:45:15 Service pipewire-pulse has been started.
 2022-07-22 12:45:15 Service pipewire has been started.
 2022-07-22 12:45:15 Service wireplumber has been started.
-2022-07-22 12:47:29 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
-2022-07-22 12:48:03 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
-2022-07-22 12:48:24 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
-2022-07-22 12:49:11 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
+2022-07-22 12:47:29 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
+2022-07-22 12:48:03 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
+2022-07-22 12:48:24 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
+2022-07-22 12:49:11 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
 2022-07-22 12:49:11 Service pipewire conflicts with running services (pipewire).
 2022-07-22 12:49:40 Exiting shepherd...
 2022-07-22 12:49:40 system-error("getpgid" "~A" ("No such process") (3))
@@ -10809,7 +10809,7 @@
 2022-07-22 12:54:18 system-error("getpgid" "~A" ("No such process") (3))
 2022-07-22 12:54:18 Service pipewire has been stopped.
 2022-07-22 12:54:18 Service pipewire has been started.
-2022-07-22 12:55:05 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-22 12:55:05 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-22 12:55:05 Service pipewire-pulse has been started.
 2022-07-22 12:55:05 Respawning pipewire-pulse.
 2022-07-22 12:55:05 Service pipewire-pulse has been started.
@@ -10825,7 +10825,7 @@
 2022-07-22 12:55:05 Service pipewire-pulse has been started.
 2022-07-22 12:55:05 Service pipewire-pulse has been disabled.
 2022-07-22 12:55:05   (Respawning too fast.)
-2022-07-22 12:57:31 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-22 12:57:31 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-22 12:57:31 Service pipewire-pulse has been started.
 2022-07-22 12:57:31 Respawning pipewire-pulse.
 2022-07-22 12:57:31 Service pipewire-pulse has been started.
@@ -10868,7 +10868,7 @@
 2022-07-22 13:02:36 Service nix-daemon has been started.
 2022-07-22 13:02:36 Service pipewire-pulse has been started.
 2022-07-22 13:02:36 Service pipewire has been started.
-2022-07-22 13:03:30 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-22 13:03:30 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-22 13:03:30 Service pipewire-pulse conflicts with running services (pipewire-pulse).
 2022-07-22 13:03:47 system-error("getpgid" "~A" ("No such process") (3))
 2022-07-22 13:03:47 Service pipewire-pulse has been stopped.
@@ -10887,9 +10887,9 @@
 2022-07-22 13:03:47 Service pipewire-pulse has been started.
 2022-07-22 13:03:47 Service pipewire-pulse has been disabled.
 2022-07-22 13:03:47   (Respawning too fast.)
-2022-07-22 13:04:11 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-22 13:04:11 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-22 13:04:11 Service pipewire-pulse has been started.
-2022-07-22 13:05:10 Loading /home/doctor-sex/.config/shepherd/init.d/wireplumber.scm.
+2022-07-22 13:05:10 Loading /home/formula/.config/shepherd/init.d/wireplumber.scm.
 2022-07-22 13:05:10 Service wireplumber has been started.
 2022-07-22 13:05:10 Respawning wireplumber.
 2022-07-22 13:05:10 Service wireplumber has been started.
@@ -10905,9 +10905,9 @@
 2022-07-22 13:05:10 Service wireplumber has been started.
 2022-07-22 13:05:10 Service wireplumber has been disabled.
 2022-07-22 13:05:10   (Respawning too fast.)
-2022-07-22 13:05:41 Loading /home/doctor-sex/.config/shepherd/init.d/wireplumber.scm.
+2022-07-22 13:05:41 Loading /home/formula/.config/shepherd/init.d/wireplumber.scm.
 2022-07-22 13:05:41 Service wireplumber has been started.
-2022-07-22 13:12:37 Loading /home/doctor-sex/.config/shepherd/init.d/wireplumber.scm.
+2022-07-22 13:12:37 Loading /home/formula/.config/shepherd/init.d/wireplumber.scm.
 2022-07-22 13:12:37 Service wireplumber conflicts with running services (wireplumber).
 2022-07-22 18:10:53 Service root has been started.
 2022-07-22 18:10:53 Service kdeconnectd has been started.
@@ -10971,7 +10971,7 @@
 2022-07-23 12:40:49 Service root has been started.
 2022-07-23 12:40:49 Service kdeconnectd has been started.
 2022-07-23 12:40:49 Service kdeconnect-indicator has been started.
-2022-07-23 12:40:56 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
+2022-07-23 12:40:56 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
 2022-07-23 12:40:56 Service pipewire has been started.
 2022-07-23 12:40:56 Respawning pipewire.
 2022-07-23 12:40:56 Service pipewire has been started.
@@ -10987,9 +10987,9 @@
 2022-07-23 12:40:56 Service pipewire has been started.
 2022-07-23 12:40:56 Service pipewire has been disabled.
 2022-07-23 12:40:56   (Respawning too fast.)
-2022-07-23 12:41:28 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire.scm.
+2022-07-23 12:41:28 Loading /home/formula/.config/shepherd/init.d/pipewire.scm.
 2022-07-23 12:41:28 Service pipewire has been started.
-2022-07-23 12:41:41 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-23 12:41:41 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-23 12:41:41 Service pipewire-pulse has been started.
 2022-07-23 12:41:41 Respawning pipewire-pulse.
 2022-07-23 12:41:41 Service pipewire-pulse has been started.
@@ -11005,9 +11005,9 @@
 2022-07-23 12:41:41 Service pipewire-pulse has been started.
 2022-07-23 12:41:41 Service pipewire-pulse has been disabled.
 2022-07-23 12:41:41   (Respawning too fast.)
-2022-07-23 12:42:03 Loading /home/doctor-sex/.config/shepherd/init.d/pipewire-pulse.scm.
+2022-07-23 12:42:03 Loading /home/formula/.config/shepherd/init.d/pipewire-pulse.scm.
 2022-07-23 12:42:03 Service pipewire-pulse has been started.
-2022-07-23 12:42:18 Loading /home/doctor-sex/.config/shepherd/init.d/wireplumber.scm.
+2022-07-23 12:42:18 Loading /home/formula/.config/shepherd/init.d/wireplumber.scm.
 2022-07-23 12:42:18 Service wireplumber has been started.
 2022-07-23 12:42:29 Exiting shepherd...
 2022-07-23 12:42:29 system-error("getpgid" "~A" ("No such process") (3))
@@ -11035,8 +11035,8 @@
 2022-07-23 12:45:20 Service pipewire-pulse has been started.
 2022-07-23 12:45:20 Service pipewire has been started.
 2022-07-23 12:45:20 Service wireplumber has been started.
-2022-07-23 12:48:22 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
-2022-07-23 12:48:35 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:48:22 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:48:35 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:48:35 Service emacs has been started.
 2022-07-23 12:48:37 Respawning emacs.
 2022-07-23 12:48:37 Service emacs has been started.
@@ -11051,16 +11051,16 @@
 2022-07-23 12:48:50 Respawning emacs.
 2022-07-23 12:48:50 Service emacs has been started.
 2022-07-23 12:48:51 Service emacs has been stopped.
-2022-07-23 12:49:10 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:49:10 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:49:10 Service emacs has been started.
 2022-07-23 12:49:13 Respawning emacs.
 2022-07-23 12:49:13 Service emacs has been started.
-2022-07-23 12:49:24 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:49:24 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:49:24 Service emacs conflicts with running services (emacs).
 2022-07-23 12:49:25 Respawning emacs.
 2022-07-23 12:49:25 Service emacs has been started.
 2022-07-23 12:49:30 Service emacs has been stopped.
-2022-07-23 12:49:31 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:49:31 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:49:31 Service emacs has been started.
 2022-07-23 12:49:50 Exiting shepherd...
 2022-07-23 12:49:50 system-error("getpgid" "~A" ("No such process") (3))
@@ -11078,11 +11078,11 @@
 2022-07-23 12:49:53 Service pipewire-pulse has been started.
 2022-07-23 12:49:53 Service pipewire has been started.
 2022-07-23 12:49:53 Service wireplumber has been started.
-2022-07-23 12:51:55 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:51:55 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:51:55 Service emacs conflicts with running services (emacs).
 2022-07-23 12:52:05 system-error("getpgid" "~A" ("No such process") (3))
 2022-07-23 12:52:05 Service emacs has been stopped.
-2022-07-23 12:52:08 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:52:08 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:52:08 Service emacs has been started.
 2022-07-23 12:52:08 Respawning emacs.
 2022-07-23 12:52:08 Service emacs has been started.
@@ -11098,7 +11098,7 @@
 2022-07-23 12:52:08 Service emacs has been started.
 2022-07-23 12:52:08 Service emacs has been disabled.
 2022-07-23 12:52:08   (Respawning too fast.)
-2022-07-23 12:53:05 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:53:05 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:53:05 Service emacs has been started.
 2022-07-23 12:53:05 Respawning emacs.
 2022-07-23 12:53:05 Service emacs has been started.
@@ -11114,7 +11114,7 @@
 2022-07-23 12:53:05 Service emacs has been started.
 2022-07-23 12:53:05 Service emacs has been disabled.
 2022-07-23 12:53:05   (Respawning too fast.)
-2022-07-23 12:53:17 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:53:17 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:53:17 Service emacs has been started.
 2022-07-23 12:53:17 Respawning emacs.
 2022-07-23 12:53:17 Service emacs has been started.
@@ -11146,7 +11146,7 @@
 2022-07-23 12:53:34 Service emacs has been disabled.
 2022-07-23 12:53:34   (Respawning too fast.)
 2022-07-23 12:53:57 Service emacs is currently disabled.
-2022-07-23 12:54:07 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:54:07 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:54:07 Service emacs has been started.
 2022-07-23 12:54:07 Respawning emacs.
 2022-07-23 12:54:07 Service emacs has been started.
@@ -11162,10 +11162,10 @@
 2022-07-23 12:54:07 Service emacs has been started.
 2022-07-23 12:54:07 Service emacs has been disabled.
 2022-07-23 12:54:07   (Respawning too fast.)
-2022-07-23 12:57:16 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 12:57:16 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 12:57:16 Service emacs has been started.
 2022-07-23 13:06:37 Service emacs has been stopped.
-2022-07-23 13:10:32 Loading /home/doctor-sex/.config/shepherd/init.d/emacs.scm.
+2022-07-23 13:10:32 Loading /home/formula/.config/shepherd/init.d/emacs.scm.
 2022-07-23 13:13:33 Exiting shepherd...
 2022-07-23 13:13:33 Service wireplumber has been stopped.
 2022-07-23 13:13:33 system-error("getpgid" "~A" ("No such process") (3))
@@ -11175,27 +11175,27 @@
 2022-07-23 13:13:33 Service pipewire has been stopped.
 2022-07-23 13:13:33 Service pipewire-pulse has been stopped.
 2022-07-23 13:13:33 Service root has been started.
-2022-07-23 13:13:33 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:33 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:33 Service root has been started.
-2022-07-23 13:13:33 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:33 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:34 Service root has been started.
-2022-07-23 13:13:34 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:34 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:34 Service root has been started.
-2022-07-23 13:13:34 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:34 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:34 Service root has been started.
-2022-07-23 13:13:34 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:34 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:52 Service root has been started.
-2022-07-23 13:13:52 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:52 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:52 Service root has been started.
-2022-07-23 13:13:52 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:52 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:52 Service root has been started.
-2022-07-23 13:13:52 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:52 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:53 Service root has been started.
-2022-07-23 13:13:53 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:53 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:53 Service root has been started.
-2022-07-23 13:13:53 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:53 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:13:59 Service root has been started.
-2022-07-23 13:13:59 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d") ("EMACSDIR=/home/doctor-sex/.config/emacs DOOMDIR=/home/doctor-sex/.config/doom.d"))
+2022-07-23 13:13:59 wrong-type-arg(#f "Wrong type to apply: ~S" ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d") ("EMACSDIR=/home/formula/.config/emacs DOOMDIR=/home/formula/.config/doom.d"))
 2022-07-23 13:14:12 Service root has been started.
 2022-07-23 13:14:12 Service emacs has been started.
 2022-07-23 13:14:12 Service kdeconnectd has been started.

@@ -21,7 +21,7 @@ IFF wad found
 Get Resolution
 Get Header Information
 InitGMLFunctions
-HighScore..SavePrePend /home/doctor-sex/.config/AM2R/ 
+HighScore..SavePrePend /home/formula/.config/AM2R/ 
 Game..Math..Graphic..Action..File..Resource..Interaction..3D..Particle..Misc..DS..Sound..Physics..Gamepad..GAMEPAD: Initialising Ubuntu support
 GAMEPAD: 4 axis values (last) at 0xf7227600
 GAMEPAD: 4 axis values (last) at 0xf72275e0

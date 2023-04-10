@@ -18,7 +18,7 @@
       fsType = "zfs";
       options = [ "zfsutil"];
     };
-  fileSystems."/home/doctor-sex" =
+  fileSystems."/home/formula" =
     { device = "zeruel/user";
       fsType = "zfs";
       options = [ "zfsutil"];

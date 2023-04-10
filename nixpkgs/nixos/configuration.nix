@@ -44,7 +44,7 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = 3;
-          ExecStart = "${kmonad}/bin/kmonad /home/doctor-sex/.config/kmonad/kmonad-x230.kbd";
+          ExecStart = "${kmonad}/bin/kmonad /home/formula/.config/kmonad/kmonad-x230.kbd";
         };
         wantedBy = [ "default.target"];
       };
@@ -54,7 +54,7 @@ in
         serviceConfig = {
           Restart = "always";
           RestartSec = 3;
-          ExecStart = "${kmonad}/bin/kmonad /home/doctor-sex/.config/kmonad/kb-half-krita.kbd";
+          ExecStart = "${kmonad}/bin/kmonad /home/formula/.config/kmonad/kb-half-krita.kbd";
         };
         wantedBy = [ "default.target"];
       };      
@@ -191,9 +191,9 @@ in
   # Enable sound.
   sound.enable = true;
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.doctor-sex = {
+  users.users.formula = {
     isNormalUser = true;
-    home = "/home/doctor-sex";
+    home = "/home/formula";
     extraGroups = [ "wheel" "audio" "video" "tty" "input" "uinput" "adbusers" "docker"]; 
     packages = with pkgs; [
       thunderbird

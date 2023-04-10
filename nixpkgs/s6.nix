@@ -3,17 +3,17 @@
 {
   xdg = {
     #define envdir
-    configFile."s6/envdir/DBUS_SESSION_BUS_ADRESS".text = ''unix:abstract=/doctor-sex/dbus'';
+    configFile."s6/envdir/DBUS_SESSION_BUS_ADRESS".text = ''unix:abstract=/formula/dbus'';
     configFile."s6/envdir/DISPLAY".text = '':1'';
-    configFile."s6/envdir/DOOMDIR".text = ''/home/doctor-sex/.config/doom.d'';
-    configFile."s6/envdir/EMACSDIR".text = ''/home/doctor-sex/.config/emacs'';
-    configFile."s6/envdir/HOME".text = ''/home/doctor-sex'';
+    configFile."s6/envdir/DOOMDIR".text = ''/home/formula/.config/doom.d'';
+    configFile."s6/envdir/EMACSDIR".text = ''/home/formula/.config/emacs'';
+    configFile."s6/envdir/HOME".text = ''/home/formula'';
     configFile."s6/envdir/LANG".text = ''en_US.UTF-8'';
     configFile."s6/envdir/UUID".text = ''1000'';
-    configFile."s6/envdir/USER".text = ''doctor-sex'';
-    configFile."s6/envdir/XAUTHORITY".text = ''/home/doctor-sex/.local/share/sx/xauthority'';
-    configFile."s6/envdir/XDG_CONFIG_HOME".text = ''/home/doctor-sex/.config'';
-    configFile."s6/envdir/XDG_DATA_HOME".text = ''/home/doctor-sex/.local/share'';
+    configFile."s6/envdir/USER".text = ''formula'';
+    configFile."s6/envdir/XAUTHORITY".text = ''/home/formula/.local/share/sx/xauthority'';
+    configFile."s6/envdir/XDG_CONFIG_HOME".text = ''/home/formula/.config'';
+    configFile."s6/envdir/XDG_DATA_HOME".text = ''/home/formula/.local/share'';
     configFile."s6/envdir/XDG_RUNTIME_DIR".text = ''/run/user/1000'';
 
     #pipewire service
