@@ -1,5 +1,9 @@
 ;; -*-Lisp-*-
 
+;;;; this is my stumpwm configuration. batteries included, but not charged.
+;;;; please escuse my wonkiness on common lisp.
+;;;; feel free to take this as inspiration and/or contribute!
+
 ;; load quicklisp
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames ".local/share/quicklisp/setup.lisp"
@@ -9,46 +13,113 @@
 
 
 ;; load sly
-;(ql:quickload :slynk)
-;(slynk:create-server :dont-close t)
-
-;; change the prefix key to something else
-(set-prefix-key (kbd "s-x"))
-(which-key-mode)
-
-;; make focus follow mouse
-(setf *mouse-focus-policy* :sloppy)
-
-;; define a custom keymap
-(defvar *my-application-keymap*
-  (let ((m (make-sparse-keymap)))
-    (define-key m (kbd "p") "exec")
-    (define-key m (kbd "l") "exec librewolf")
-
-  m))
 
 
+(unless (sb-ext:run-program "/usr/bin/lsof" '("-i" "TCP:4005"))
+  (progn
+    (ql:quickload :slynk)
+    (slynk:create-server :dont-close t)))
+(ql:quickload :swank)
+
+;;; define some colors.
 (defvar *background* "#000000")
 (defvar *foreground* "#FFFFFF")
 
-(define-key *root-map* (kbd "x") '*my-application-keymap*)
-(define-key *root-map* (kbd "1") "only")
-(define-key *root-map* (kbd "2") "vsplit")
-(define-key *root-map* (kbd "3") "hsplit")
-(define-key *root-map* (kbd "0") "remove-split")
-(define-key *root-map* (kbd "l") "move-window right")
+(defcommand emacs-calendar () ()
+  (emacs)
+  (send-meta-key (current-screen) (kbd "M-x"))
+  (window-send-string "=calendar")
+  (send-meta-key (current-screen) (kbd "RET")))
 
+;;; keybindings
+;; make focus follow mouse
+(setf *mouse-focus-policy* :sloppy)
 
+;; define a custom keymap for applications
+(defvar *my-application-keymap*
+  (let ((m (make-sparse-keymap)))
+    (define-key m (kbd "l") "exec librewolf")
+    (define-key m (kbd "c") "exec chromium")
+    (define-key m (kbd "s") "exec slack")
+    (define-key m (kbd "t") "exec boxxy thunderbird")
+    (define-key m (kbd "C-t") "exec trello")
+  m))
+
+;; set the prefix to mod-x, to emulate emacs.
+(set-prefix-key (kbd "s-x"))
+;; activate which key mode, which could be helpful.
+(defvar *stumpish-location*
+  "/usr/share/stumpwm/contrib/util/stumpish")
+;;; *root-map* keybindings, aka prefixed to the above
+;; emacs like keybindings
+(define-key *root-map* (kbd "x")    '*my-application-keymap*)
+(define-key *root-map* (kbd "1")    "remove-split")
+(define-key *root-map* (kbd "2")    "vsplit")
+(define-key *root-map* (kbd "3")    "hsplit")
+(define-key *root-map* (kbd "0")    "remove-split")
+(define-key *root-map* (kbd "s-b")  "windowlist")
+(define-key *root-map* (kbd "d")    "time")
+(define-key *root-map* (kbd "RET")  "exec emacsclient -ce '(eshell)'")
+(define-key *root-map* (kbd "C-RET") "exec emacsclient -ce '(+stumpish-vterm/here)'")
+
+;;; top-level keybindings, aka with no prefix
 (define-key *top-map* (kbd "s-RET") "exec emacsclient -ce '(+vterm/here \"~/\")'")
-
-
-
+;(define-key *top-map* (kbd "s-RET") "exec emacsclient -ce '(eshell)'")
 (define-key *top-map* (kbd "s-h") "move-focus left")
 (define-key *top-map* (kbd "s-j") "move-focus down")
 (define-key *top-map* (kbd "s-k") "move-focus up")
 (define-key *top-map* (kbd "s-l") "move-focus right")
 (define-key *top-map* (kbd "s-p") "exec")
-
-
 (define-key *top-map* (kbd "s-r") "loadrc")
 (define-key *top-map* (kbd "s-:") "eval")
+
+;;; modeline
+
+;; time format
+(setf *mode-line-timeout* 1)
+(setf *time-modeline-string* "%b %a %d (%H:%M:%S)")
+
+;; set window title
+(setf *window-format* "%n: %10t")
+
+;; color the modeline!
+(let ((black "#000000")
+      (white "#FFFFFF"))
+  (setf *mode-line-background-color* black
+        *mode-line-foreground-color* white
+        *mode-line-border-color* white
+        *mode-line-border-width 1)
+        *mode-line-border-width 1)
+
+(macrolet ((dbus-run-program (prog)
+             `(run-shell-program (concatenate 'string "dbus-launch " ,prog))))
+(when *initializing*
+  (progn
+    (dbus-run-program "slack")
+    (dbus-run-program "boxxy thunderbird")
+    (dbus-run-program "trello"))
+  (mode-line)))
+
+
+(load-module "battery-portable")
+(load-module "cpu")
+(load-module "mem")
+(setf cpu::*cpu-modeline-fmt*        "%c"
+      cpu::*cpu-usage-modeline-fmt*  "~A~2D%"
+      mem::*mem-modeline-fmt*        "%a%p"
+      *hidden-window-color*          "^**"
+      *mode-line-highlight-template* "«~A»")
+
+;; format the status line
+(setf stumpwm:*screen-mode-line-format*
+      (list "[%g]"
+            "[%W]"
+            "[%w]"
+            "^>"
+            "[%d]"
+            "[CPU:%C]"
+            "[MEM:%M]"
+;            "[BAT:%B]"
+            ))
+
+;
