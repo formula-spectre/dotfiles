@@ -1,12 +1,9 @@
 #+TITLE: Doom Emacs configuration
 #+AUTHOR: Cloud Strife (Spektrum_light, gear-piped, purity-interface, topological android GAR-XB/G-3778 id: MGlIGTfxzZ)
 #+PROPERTY: :tangle yes
-
 this is my emacs configuration. it's not pretty. it's not functional. But it works for me. Deal with it
 jokes aside, still working on improving both the org structure and the code itself. please do tell me that my elisp sucks, I need some CC
 any help is appreciated :)
-
- use lexical bindings
  #+BEGIN_SRC emacs-lisp
  ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
  #+END_SRC
@@ -390,7 +387,26 @@ _SPC_ cancel	   	_d_elete
  #+BEGIN_SRC emacs-lisp
  (global-set-key (kbd "C-\\") #'undo)
  #+END_SRC
+<<<<<<< Updated upstream
 
+=======
+** EXWM configuration
+*** exwmsw configuration
+ map where the workspaces shall be
+ #+BEGIN_SRC emacs-lisp
+ (setq exwmsw-active-workspace-plist
+       '("HDMI-1" 0 "HDMI-2" 0
+         "LVDS-1" 1 "HDMI-2" 1
+         "LVDS-1" 2 "HDMI-2" 2
+         "LVDS-1" 3 "HDMI-2" 3
+         "LVDS-1" 4 "HDMI-2" 4
+         "LVDS-1" 5 "HDMI-2" 5
+         "LVDS-1" 6 "HDMI-2" 6
+         "LVDS-1" 7 "HDMI-2" 7))
+ (setq exwmsw-the-right-screen "LVDS1")
+ (setq exwmsw-the-center-screen "HDMI-2")
+ #+END_SRC
+>>>>>>> Stashed changes
 
 *** define some helper functions
  efs stands for emacs from scratch since I +stole+ /borrowed/ this part from system crafters.

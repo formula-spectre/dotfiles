@@ -1,30 +1,52 @@
+*  this is my stumpwm configuration. batteries included, but not charged. please escuse my wonkiness on common lisp.  feel free to take this as inspiration and/or contribute!
+
+**  load quicklisp
+#+BEGIN_SRC lisp :tangle config
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames ".local/share/quicklisp/setup.lisp"
                                        (user-homedir-pathname))))
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
+#+END_SRC
 
+** load sly
+#+BEGIN_SRC lisp :tangle config
 (unless (sb-ext:run-program "/usr/bin/lsof" '("-i" "TCP:4005"))
   (progn
     (ql:quickload :slynk)
     (slynk:create-server :dont-close t)))
 (ql:quickload :swank)
-
+#+END_SRC
+** define some colors.
+#+BEGIN_SRC lisp :tangle config
 (defvar *background* "#000000")
 (defvar *foreground* "#FFFFFF")
-
+#+END_SRC
+** macros!
+*** define a macro to make generate emacs commands
+#+BEGIN_SRC lisp :tangle config
 (defmacro emacs-cmd (name emacs-command)
     `(defcommand ,name () ()
        (emacs)
        (meta (kbd "M-x"))
        (window-send-string ,emacs-command)
        (meta (kbd "RET"))))
+#+END_SRC
 
+*** define a macro to make mapping to various maps (heh) easier
+#+BEGIN_SRC lisp :tangle config
 (defmacro mmap (map key command)
   `(define-key ,map (kbd ,key) ,command))
+#+END_SRC
 
+**  keybindings
+***  make focus follow mouse
+#+BEGIN_SRC lisp :tangle config
 (setf *mouse-focus-policy* :sloppy)
+#+END_SRC
 
+*** define a custom keymap for my most used applications
+#+BEGIN_SRC lisp :tangle config
 (defvar *my-application-keymap*
   (let ((m (make-sparse-keymap)))
     (mmap m "l" "exec librewolf")
@@ -33,11 +55,22 @@
     (mmap m "t" "exec boxxy thunderbird")
     (mmap m "C-t" "exec trello")
   m))
+#+END_SRC
 
+*** set the prefix to mod-x, to emulate emacs.
+#+BEGIN_SRC lisp :tangle config
 (set-prefix-key (kbd "s-x"))
-
+#+END_SRC
+*** activate which key mode, which could be helpful.
+#+BEGIN_SRC lisp :tangle config
 (which-key-mode)
-
+#+END_SRC
+*** *root-map* keybindings, aka prefixed ones (see prefix-key)
+;;; *root-map* keybindings, aka prefixed to the above
+;; emacs like keybindings
+(emacs-cmd emacs-calendar "=calendar")
+(emacs-cmd emacs-magit  "magit")
+#+BEGIN_SRC lisp :tangle config
 (mmap *root-map* "x"       '*my-application-keymap*)
 (mmap *root-map* "1"       "remove-split")
 (mmap *root-map* "2"       "vsplit")
@@ -47,7 +80,9 @@
 (mmap *root-map* "d"       "time")
 (mmap *root-map* "RET"     "exec emacsclient -ce '(eshell)'")
 (mmap *root-map* "C-RET"   "exec emacsclient -ce '(+stumpish-vterm/here)'")
-
+#+END_SRC
+*** *top-level* keybindings, aka with no prefix
+#+BEGIN_SRC lisp :tangle config
 (mmap *top-map*  "s-RET"     "exec emacsclient -ce '(+vterm/here \"~/\")'")
 (mmap *top-map*  "s-h"       "move-focus left")
 (mmap *top-map*  "s-j"       "move-focus down")
@@ -56,12 +91,18 @@
 (mmap *top-map*  "s-p"       "exec")
 (mmap *top-map*  "s-r"       "loadrc")
 (mmap *top-map*  "s-:"       "eval")
-
+#+END_SRC
+**  modeline
+**** formatting
+here I format most of the modeline.
+#+BEGIN_SRC lisp :tangle config
 (setf *mode-line-timeout* 1)
 (setf *time-modeline-string* "%b %a %d (%H:%M:%S)")
 ;; set window title, truncate after 10 chars
 (setf *window-format* "%n: %10t")
-
+#+END_SRC
+**** color the modeline!
+#+BEGIN_SRC lisp :tangle config
 (let ((black "#000000")
       (white "#FFFFFF"))
   (setf *mode-line-background-color* black
@@ -69,17 +110,23 @@
         *mode-line-border-color* white
         *mode-line-border-width 1)
         *mode-line-border-width 1)
-
+#+END_SRC
+**** load some modules
+#+BEGIN_SRC lisp :tangle config
 (load-module "battery-portable")
 (load-module "cpu")
 (load-module "mem")
-
+#+END_SRC
+**** format the various elements of the modeline
+#+BEGIN_SRC lisp :tangle config
 (setf cpu::*cpu-modeline-fmt*        "%c"
       cpu::*cpu-usage-modeline-fmt*  "~A~2D%"
       mem::*mem-modeline-fmt*        "%a%p"
       *hidden-window-color*          "^**"
       *mode-line-highlight-template* "«~A»")
-
+#+END_SRC
+*** format the status line
+#+BEGIN_SRC lisp :tangle config
 (setf stumpwm:*screen-mode-line-format*
       (list "[%g]"
             "[%W]"
@@ -90,7 +137,14 @@
             "[MEM:%M]"
 ;            "[BAT:%B]"
             ))
+#+END_SRC
 
+
+
+** initalization
+things that have to be ran on startup.
+the dbus thing is a crutch.
+#+BEGIN_SRC lisp :tangle config
 (macrolet ((dbus-run-program (prog)
              `(run-shell-program (concatenate 'string "dbus-launch " ,prog))))
 (when *initializing*
@@ -100,3 +154,4 @@
     (dbus-run-program "trello")
     (dbus-run-program "keynav"))
   (mode-line)))
+#+END_SRC
