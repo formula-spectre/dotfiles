@@ -1,6 +1,6 @@
 #+TITLE: Stumpwm configuration
 #+AUTHOR: Cloud Strife (Spektrum_light, gear-piped, purity-interface, topological android GAR-XB/G-3778 id: MGlIGTfxzZ formula-spectre)
-#+PROPERTY: header-args :tangle "~/.config/stumpwm/config" :mkdirp t :shebang ";; -*- lisp-mode -*- \n"
+#+PROPERTY: header-args :tangle "~/.config/stumpwm/config" :mkdirp t :shebang ";; -*- mode: lisp -*- \n"
 #+auto_tangle: t
 *  this is my stumpwm configuration. batteries included, but not charged. please escuse my wonkiness on common lisp.  feel free to take this as inspiration and/or contribute!
 
@@ -13,13 +13,28 @@
     (load quicklisp-init)))
 #+END_SRC
 
-** load sly
+** load slynk/swank
 #+BEGIN_SRC lisp
-  (unless (sb-ext:run-program "/usr/bin/lsof" '("-i" "TCP:4005"))
-    (progn
-      (ql:quickload :slynk)
-      (slynk:create-server :dont-close t)))
-  (ql:quickload :swank)
+(ql:quickload :slynk)
+(ql:quickload :swank)
+(let ((server-running nil))
+  (defcommand slynk () ()
+    "Toggle the swank server on/off"
+    (if server-running
+	(progn
+	  (swank:stop-server 4005)
+	  (echo-string
+	   (current-screen)
+	   "Stopping swank.")
+	  (setf server-running nil))
+	(progn
+	  (swank:create-server :port 4005
+			       :style swank:*communication-style*
+			       :dont-close t)
+	  (echo-string
+	   (current-screen)
+	   "Starting swank. M-x slime-connect RET RET, then (in-package stumpwm).")
+	  (setf server-running t)))))
 #+END_SRC
 
 ** define some colors.
@@ -31,16 +46,22 @@
 *** define a macro to make generate emacs commands
 #+BEGIN_SRC lisp
 (defmacro emacs-cmd (name emacs-command)
+  "a macro that permits to easily define emacs commands"
     `(defcommand ,name () ()
        (emacs)
        (meta (kbd "M-x"))
-       (window-send-string ,emacs-command)
+..»       (window-send-string ,emacs-command)
        (meta (kbd "RET"))))
 #+END_SRC
-
+**** emacs commands
+#+BEGIN_SRC lisp
+(emacs-cmd emacs-magit    "magit")
+(emacs-cmd emacs-calendar "=calendar")
+#+END_SRC
 *** define a macro to make mapping to various maps (heh) easier
 #+BEGIN_SRC lisp
 (defmacro mmap (map key command)
+  "a macro to make binding easier"
   `(define-key ,map (kbd ,key) ,command))
 #+END_SRC
 
@@ -59,22 +80,28 @@
     (mmap m "s" "exec slack")
     (mmap m "t" "exec boxxy thunderbird")
     (mmap m "C-t" "exec trello")
+    (mmap m "C-a" "exec trello exec boxxy thunderbird exec slack")
   m))
 #+END_SRC
+*** define a custom keymap for emacs commands
+#+BEGIN_SRC lisp
+(defvar *emacs-application-keymap*
+   (let ((m (make-sparse-keymap)))
+    (mmap m "m" "emacs-magit")
+    (mmap m "c" "emacs-calendar")
+  m))
 
+#+END_SRC
 *** set the prefix to mod-x, to emulate emacs.
 #+BEGIN_SRC lisp
 (set-prefix-key (kbd "s-x"))
 #+END_SRC
 *** activate which key mode, which could be helpful.
 #+BEGIN_SRC lisp
-(which-key-mode)
+(unless (which-key-mode)
+  (which-key-mode))
 #+END_SRC
 *** *root-map* keybindings, aka prefixed ones (see prefix-key)
-;;; *root-map* keybindings, aka prefixed to the above
-;; emacs like keybindings
-(emacs-cmd emacs-calendar "=calendar")
-(emacs-cmd emacs-magit  "magit")
 #+BEGIN_SRC lisp
 (mmap *root-map* "x"       '*my-application-keymap*)
 (mmap *root-map* "1"       "remove-split")
@@ -82,6 +109,7 @@
 (mmap *root-map* "3"       "hsplit")
 (mmap *root-map* "0"       "remove-split")
 (mmap *root-map* "s-b"     "windowlist")
+(mmap *root-map* "s"       "slynk")
 (mmap *root-map* "d"       "time")
 (mmap *root-map* "RET"     "exec emacsclient -ce '(eshell)'")
 (mmap *root-map* "C-RET"   "exec emacsclient -ce '(+stumpish-vterm/here)'")
@@ -89,6 +117,7 @@
 (mmap *root-map* "s-j"     "move-window down")
 (mmap *root-map* "s-k"     "move-window up")
 (mmap *root-map* "s-l"     "move-window right")
+(mmap *root-map* "C-e"      '*emacs-application-keymap*)
 #+END_SRC
 *** *top-level* keybindings, aka with no prefix
 #+BEGIN_SRC lisp
@@ -136,8 +165,7 @@ here I format most of the modeline.
 #+END_SRC
 *** format the status line
 #+BEGIN_SRC lisp
-(load-module "stumptray")
-(stumptray::stumptray)
+
 (setf stumpwm:*screen-mode-line-format*
       (list ;;"[%g]"
             "[%W]"
@@ -155,14 +183,14 @@ here I format most of the modeline.
 things that have to be ran on startup.
 the dbus thing is a crutch.
 #+BEGIN_SRC lisp
-(macrolet ((run-prog (prog)
-             `(sb-ext:run-program  (concatenate 'string "dbus-launch " ,prog))))
 (when *initializing*
   (progn
     (sb-ext:run-program "sh" '("~/.fehbg"))
-    (dbus-run-program "boxxy thunderbird")
-    (dbus-run-program "trello")
-    (dbus-run-program "keynav")
-    (mode-line))))
-  
+    (sb-ext:run-program "keynav" '())
+    (mode-line)))
+
+(unless (mode-line)
+  (mode-line))
+(load-module "stumptray")
+(stumptray::stumptray)
 #+END_SRC

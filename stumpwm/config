@@ -1,4 +1,4 @@
-;; -*- lisp-mode -*- 
+;; -*- mode: lisp -*- 
 
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames ".local/share/quicklisp/setup.lisp"
@@ -6,23 +6,43 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-  (unless (sb-ext:run-program "/usr/bin/lsof" '("-i" "TCP:4005"))
-    (progn
-      (ql:quickload :slynk)
-      (slynk:create-server :dont-close t)))
-  (ql:quickload :swank)
+(ql:quickload :slynk)
+(ql:quickload :swank)
+(let ((server-running nil))
+  (defcommand slynk () ()
+    "Toggle the swank server on/off"
+    (if server-running
+	(progn
+	  (swank:stop-server 4005)
+	  (echo-string
+	   (current-screen)
+	   "Stopping swank.")
+	  (setf server-running nil))
+	(progn
+	  (swank:create-server :port 4005
+			       :style swank:*communication-style*
+			       :dont-close t)
+	  (echo-string
+	   (current-screen)
+	   "Starting swank. M-x slime-connect RET RET, then (in-package stumpwm).")
+	  (setf server-running t)))))
 
 (defvar *background* "#000000")
 (defvar *foreground* "#FFFFFF")
 
 (defmacro emacs-cmd (name emacs-command)
+  "a macro that permits to easily define emacs commands"
     `(defcommand ,name () ()
        (emacs)
        (meta (kbd "M-x"))
-       (window-send-string ,emacs-command)
+..»       (window-send-string ,emacs-command)
        (meta (kbd "RET"))))
 
+(emacs-cmd emacs-magit    "magit")
+(emacs-cmd emacs-calendar "=calendar")
+
 (defmacro mmap (map key command)
+  "a macro to make binding easier"
   `(define-key ,map (kbd ,key) ,command))
 
 (setf *mouse-focus-policy* :sloppy)
@@ -34,11 +54,19 @@
     (mmap m "s" "exec slack")
     (mmap m "t" "exec boxxy thunderbird")
     (mmap m "C-t" "exec trello")
+    (mmap m "C-a" "exec trello exec boxxy thunderbird exec slack")
+  m))
+
+(defvar *emacs-application-keymap*
+   (let ((m (make-sparse-keymap)))
+    (mmap m "m" "emacs-magit")
+    (mmap m "c" "emacs-calendar")
   m))
 
 (set-prefix-key (kbd "s-x"))
 
-(which-key-mode)
+(unless (which-key-mode)
+  (which-key-mode))
 
 (mmap *root-map* "x"       '*my-application-keymap*)
 (mmap *root-map* "1"       "remove-split")
@@ -46,6 +74,7 @@
 (mmap *root-map* "3"       "hsplit")
 (mmap *root-map* "0"       "remove-split")
 (mmap *root-map* "s-b"     "windowlist")
+(mmap *root-map* "s"       "slynk")
 (mmap *root-map* "d"       "time")
 (mmap *root-map* "RET"     "exec emacsclient -ce '(eshell)'")
 (mmap *root-map* "C-RET"   "exec emacsclient -ce '(+stumpish-vterm/here)'")
@@ -53,6 +82,7 @@
 (mmap *root-map* "s-j"     "move-window down")
 (mmap *root-map* "s-k"     "move-window up")
 (mmap *root-map* "s-l"     "move-window right")
+(mmap *root-map* "C-e"      '*emacs-application-keymap*)
 
 (mmap *top-map*  "s-RET"     "exec emacsclient -ce '(+vterm/here \"~/\")'")
 (mmap *top-map*  "s-h"       "move-focus left")
@@ -86,8 +116,6 @@
       *hidden-window-color*          "^**"
       *mode-line-highlight-template* "«~A»")
 
-(load-module "stumptray")
-(stumptray::stumptray)
 (setf stumpwm:*screen-mode-line-format*
       (list ;;"[%g]"
             "[%W]"
@@ -99,12 +127,13 @@
 ;            "[BAT:%B]"
             ))
 
-(macrolet ((run-prog (prog)
-             `(sb-ext:run-program  (concatenate 'string "dbus-launch " ,prog))))
 (when *initializing*
   (progn
     (sb-ext:run-program "sh" '("~/.fehbg"))
-    (dbus-run-program "boxxy thunderbird")
-    (dbus-run-program "trello")
-    (dbus-run-program "keynav")
-    (mode-line))))
+    (sb-ext:run-program "keynav" '())
+    (mode-line)))
+
+(unless (mode-line)
+  (mode-line))
+(load-module "stumptray")
+(stumptray::stumptray)
