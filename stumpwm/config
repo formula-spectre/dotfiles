@@ -1,14 +1,16 @@
+;; -*- lisp-mode -*- 
+
 #-quicklisp
 (let ((quicklisp-init (merge-pathnames ".local/share/quicklisp/setup.lisp"
                                        (user-homedir-pathname))))
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(unless (sb-ext:run-program "/usr/bin/lsof" '("-i" "TCP:4005"))
-  (progn
-    (ql:quickload :slynk)
-    (slynk:create-server :dont-close t)))
-(ql:quickload :swank)
+  (unless (sb-ext:run-program "/usr/bin/lsof" '("-i" "TCP:4005"))
+    (progn
+      (ql:quickload :slynk)
+      (slynk:create-server :dont-close t)))
+  (ql:quickload :swank)
 
 (defvar *background* "#000000")
 (defvar *foreground* "#FFFFFF")
@@ -47,6 +49,10 @@
 (mmap *root-map* "d"       "time")
 (mmap *root-map* "RET"     "exec emacsclient -ce '(eshell)'")
 (mmap *root-map* "C-RET"   "exec emacsclient -ce '(+stumpish-vterm/here)'")
+(mmap *root-map* "s-h"     "move-window left")
+(mmap *root-map* "s-j"     "move-window down")
+(mmap *root-map* "s-k"     "move-window up")
+(mmap *root-map* "s-l"     "move-window right")
 
 (mmap *top-map*  "s-RET"     "exec emacsclient -ce '(+vterm/here \"~/\")'")
 (mmap *top-map*  "s-h"       "move-focus left")
@@ -59,8 +65,8 @@
 
 (setf *mode-line-timeout* 1)
 (setf *time-modeline-string* "%b %a %d (%H:%M:%S)")
-;; set window title, truncate after 10 chars
-(setf *window-format* "%n: %10t")
+;; set window title, truncate after 5 chars
+(setf *window-format* "%n: %5t")
 
 (let ((black "#000000")
       (white "#FFFFFF"))
@@ -80,8 +86,10 @@
       *hidden-window-color*          "^**"
       *mode-line-highlight-template* "«~A»")
 
+(load-module "stumptray")
+(stumptray::stumptray)
 (setf stumpwm:*screen-mode-line-format*
-      (list "[%g]"
+      (list ;;"[%g]"
             "[%W]"
             "[%w]"
             "^>"
@@ -91,12 +99,12 @@
 ;            "[BAT:%B]"
             ))
 
-(macrolet ((dbus-run-program (prog)
-             `(run-shell-program (concatenate 'string "dbus-launch " ,prog))))
+(macrolet ((run-prog (prog)
+             `(sb-ext:run-program  (concatenate 'string "dbus-launch " ,prog))))
 (when *initializing*
   (progn
-    (dbus-run-program "slack")
+    (sb-ext:run-program "sh" '("~/.fehbg"))
     (dbus-run-program "boxxy thunderbird")
     (dbus-run-program "trello")
-    (dbus-run-program "keynav"))
-  (mode-line)))
+    (dbus-run-program "keynav")
+    (mode-line))))
