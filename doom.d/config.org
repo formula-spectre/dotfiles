@@ -1,164 +1,17 @@
 #+TITLE: Doom Emacs configuration
-#+AUTHOR: Cloud Strife (Spektrum_light, gear-piped, purity-interface, topological android GAR-XB/G-3778 id: MGlIGTfxzZ)
-#+PROPERTY: :tangle yes
+#+AUTHOR: Cloud Strife (Spektrum_light, gear-piped, purity-interface, topological android GAR-XB/G-3778 id: MGlIGTfxzZ formula-spectre)
+
+
 this is my emacs configuration. it's not pretty. it's not functional. But it works for me. Deal with it
 jokes aside, still working on improving both the org structure and the code itself. please do tell me that my elisp sucks, I need some CC
 any help is appreciated :)
+
+ use lexical bindings
  #+BEGIN_SRC emacs-lisp
  ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
  #+END_SRC
-* configure xmobar
+*configure xmobar
 this section has been stolen from the xmobar etc codeberg repo directory, all credits to jaor:
- #+BEGIN_SRC emacs-lisp
- (eval-when-compile (require 'cl-lib))
-
- (require 'tab-bar)
- (require 'xterm-color nil t)
-
- (defgroup xmobar nil
-   "xmobar status display for Emacs."
-   :version "0.0.1"
-   :group 'mode-line)
-
- (defcustom xmobar-command '("~/.local/bin/xmobar-emacs" "-TAnsi")
-   "The xmobar command and flags."
-   :type '(choice (string :tag "Shell Command")
-                  (repeat (string))))
-
- (defcustom xmobar-tab-bar t
-   "Whether to dispaly xmobar output in the tab bar."
-   :type 'boolean)
- (setq xmobar-tab-bar nil)
- (defcustom xmobar-tab-split nil
-   "Split on this string for `xmobar-left-string' and `xmobar-right-string'."
-   :type 'string)
-
- (defcustom xmobar-tab-bar-format
-   '(xmobar-left-string xmobar-elastic-space xmobar-right-string)
-   "Format for the tab bar when `xmobar-tab-bar' is t."
-   :type 'list)
-
- (defvar xmobar--process nil
-   "The running xmobar process, if any.")
-
- (defvar xmobar--left-string "")
-
- (defvar xmobar-string ""
-   "The xmobar string to be displayed in the mode-line or tab-bar.")
-
- (put 'xmobar-string 'risky-local-variable t)
-
- (defvar xmobar--colorize-fn
-   (if (featurep 'xterm-color) #'xterm-color-filter #'ansi-color-apply))
-
- (defvar xmobar--old-tab-format tab-bar-format)
- (defvar xmobar--len 0)
-
- (defun xmobar-string () xmobar-string)
- (defun xmobar-right-string () xmobar-string)
- (defun xmobar-left-string () xmobar--left-string)
- (defun xmobar-elastic-space () (make-string (- (frame-width) xmobar--len 3) ? ))
-
- ;;;###auto
- (define-minor-mode xmobar-mode
-   "Display an xmobar in the mode-line."
-   :global t :group 'xmobar
-   (xmobar--stop)
-   (if xmobar-mode
-       (progn (if xmobar-tab-bar
-                  (progn
-                    (setq xmobar--old-tab-format tab-bar-format)
-                    (setq tab-bar-format xmobar-tab-bar-format)
-                    (tab-bar-mode 1))
-                (or global-mode-string (setq global-mode-string '("")))
-                (unless (memq 'xmobar-string global-mode-string)
-                  (add-to-list 'global-mode-string 'xmobar-string t)))
-              (xmobar--start))
-     (when xmobar-tab-bar (setq tab-bar-format xmobar--old-tab-format))))
-
- (defun xmobar--update (update)
-   "Apply an UPDATE to the xmobar bar."
-   (when xmobar-mode
-     (let* ((str (funcall xmobar--colorize-fn update))
-            (strs (and xmobar-tab-split (split-string str xmobar-tab-split))))
-       (setq xmobar-string (if strs (cadr strs) str)
-             xmobar--left-string (or (car strs) "")
-             xmobar--len (+ (string-width xmobar--left-string)
-                            (string-width xmobar-string))))
-     (force-mode-line-update t)))
-
- (defun xmobar--process-filter (proc string)
-   "Process output from the xmobar process."
-   (let ((buf (process-buffer proc)))
-     (when (buffer-live-p buf)
-       (with-current-buffer buf
-         ;; Write the input to the buffer (might be partial).
-         (save-excursion
-           (goto-char (process-mark proc))
-           (insert string)
-           (set-marker (process-mark proc) (point)))
-         (when (string-match-p "\n$" string)
-           (xmobar--update (buffer-substring (point-min) (- (point-max) 1)))
-           (delete-region (point-min) (point-max)))))))
-
- (defun xmobar--process-sentinel (proc status)
-   "Handle events from the xmobar process (PROC).
- If the process has exited, this function stores the exit STATUS in
- `xmobar-string'."
-   (unless (process-live-p proc)
-     (setq xmobar--process nil)
-     (let ((buf (process-buffer proc)))
-       (when (and buf (buffer-live-p buf)) (kill-buffer buf)))
-     (setq xmobar-string (format "xmobar: %s" status) xmobar--left-string "")))
-
- (defun xmobar--start ()
-   "Start xmobar."
-   (xmobar--stop)
-   (condition-case err
-       (setq xmobar--process
-             (make-process
-              :name "xmobar"
-              :buffer " *xmobar process*"
-              :stderr " *xmobar stderr*"
-              :command (ensure-list xmobar-command)
-              :connection-type 'pipe
-              :noquery t
-              :sentinel #'xmobar--process-sentinel
-              :filter #'xmobar--process-filter))
-     (error
-      (setq xmobar-string
-            (format "starting xmobar: %s" (error-message-string err))
-            xmobar--left-string ""))))
-
- (defun xmobar--stop ()
-   "Stop xmobar."
-   (when (and xmobar--process (process-live-p xmobar--process))
-     (delete-process xmobar--process))
-   (setq xmobar-string "" xmobar--left-string ""))
-
- ;;;###autoload
- (defun xmobar-restart ()
-   "Restart the xmobar program."
-   (interactive)
-   (unless xmobar-mode (user-error "The xmobar-mode is not enabled"))
-   (xmobar--start))
-
- (provide 'xmobar)
-
- (defun xmobartrayer ()
-   (interactive)
-   "this just spawns the trayer for xmobar"
-   (start-process-shell-command "trayer" nil "s6-rc -l /tmp/formula/s6-rc -u change trayer"))
-
-(defun restart-xmobar-trayer ()
-  "restarts trayers for xmobar"
-  (interactive)
-  (start-process-shell-command "pkill" nil "s6-svc -r /tmp/formula/service/trayer"))
-
-(add-hook 'xmobar-mode-hook #'xmobartrayer)
-
-(add-hook 'xmobar-restart-hook #'restart-xmobar-trayer)
- #+END_SRC
 
 * Main emacs configuration
 ** theme emacs bit
@@ -177,7 +30,7 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
       doom-modeline-icons   t)
 (setq truncate-lines nil)
 #+END_SRC
-*** vterm
+*** vterm configuration
 #+BEGIN_SRC emacs-lisp
 (setq vterm-kill-buffer-on-exit t)
 (setq vterm-term-environment-variable "xterm")
@@ -185,16 +38,15 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
 #+END_SRC
 *** General appearence
 #+BEGIN_SRC emacs-lisp
-(setq doom-theme 'monochrome)
+(setq doom-theme 'cyberpunk     )
 (setq doom-line-numbers-style 'relative)
 (setq display-line-numbers-type 'relative)
- ;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
  (setq org-directory "~/org/")
  #+END_SRC
  set my name, and my email address, plus more private things
  #+BEGIN_SRC emacs-lisp
-(load! (concat (getenv "DOOMDIR") "/private"))
+(when (file-exists-p (concat (getenv "DOOMDIR") "/private.el"))
+  (load! (concat (getenv "DOOMDIR") "/private")))
  #+END_SRC
 *** doom's flavor text
   Here are some additional functions/macros that could help you configure Doom:
@@ -205,10 +57,11 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
     this file. Emacs searches the `load-path' when you load packages with
     `require' or `use-package'.
   - `map!' for binding new keys
-
 ** mu4e configuration
  #+BEGIN_SRC emacs-lisp
- (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+ (when (file-directory-p "/usr/share/emacs/site-lisp/mu4e" )
+   (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))
+
   (use-package mu4e
     :ensure nil
     :load-path "/usr/share/emacs/site-lisp/mu4e/"
@@ -243,20 +96,36 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
 (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
 #+END_SRC
 ** misc stuff
-#+BEGIN_SRC emacs-lisp
- (setq org-directory "~/org/")
- (load! (concat (getenv "DOOMDIR") "/private"))
-#+END_SRC
 *** frog-jumper configuration
 #+BEGIN_SRC emacs-lisp
 (use-package frog-jump-buffer :ensure t)
 (unbind-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'frog-jump-buffer)
-(global-set-key (kbd "C-x b") #'ibuffer)
+(global-set-key (kbd "C-x B") #'ibuffer)
 (setq frog-jump-buffer-use-all-the-icons-ivy t)
 (dolist (regexp '("^\\*Native-compile-log" "^\\*Async-native-compile-log" "^\\*Messages"))
   (push regexp frog-jump-buffer-ignore-buffers))
 #+END_SRC
+*** stumpwm configuration
+this is for stumpwm, it's hacky at best
+#+BEGIN_SRC emacs-lisp
+(defun +stumpish-vterm/here ()
+  (interactive)
+  (dlet ((vterm-shell "/usr/bin/stumpish"))
+    (interactive)
+    (+vterm/here "~/")))
+
+(defun stumpish-vterm ()
+  (interactive)
+  (dlet ((vterm-shell "/usr/bin/stumpish"))
+    (interactive)
+    (vterm "stumpish")))
+
+(defun comint-stumpish ()
+  (interactive)
+  (comint-run "/usr/bin/stumpish"))
+#+END_SRC
+
 *** gentoo specific stuff
 #+BEGIN_SRC emacs-lisp
     (when (string= (doom-system-distro) "gentoo")
@@ -264,29 +133,30 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
 (require 'magentoo))
 #+END_SRC
 
-
-;(require 'portage)
-;(require 'magentoo)
 *** TRAMP configuration
 #+BEGIN_SRC emacs-lisp
 (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
 #+END_SRC
-*
 *** keybindings
- here I define some keybindings; I use the hydra package too
+**** here I define some keybindings; I use the hydra package too
 ***** defining hydras
 ****** hydra-window
 #+BEGIN_SRC emacs-lisp
+(cl-macrolet ((ace-lambda (number)
+                          `(lambda () (interactive)
+                            (ace-window ,number)
+                            (add-hook 'ace-window-end-once-hook
+                                      'hydra-window/body))))
  (defhydra hydra-window ()
    "
 Movement^^        ^Split^         ^Switch^		^Resize^
 ----------------------------------------------------------------
-_h_ ←       	_v_ertical                  	_q_ X←
+_h_ ←       	_v_ertical    		_q_ X←
 _j_ ↓        	_x_ horizontal	_f_ind files	_w_ X↓
 _k_ ↑        	_z_ undo      	_a_ce 1		_e_ X↑
 _l_ →        	_Z_ reset      	_s_wap		_r_ X→
 _F_ollow		_D_lt Other   	_S_ave		max_i_mize
-_SPC_ cancel	   	_d_elete
+_SPC_ cancel	  	_d_elete
 "
    ("h" windmove-left )
    ("j" windmove-down )
@@ -296,48 +166,36 @@ _SPC_ cancel	   	_d_elete
    ("w" hydra-move-splitter-down)
    ("e" hydra-move-splitter-up)
    ("r" hydra-move-splitter-right)
-  ; ("b" helm-mini)
+   ;("b" helm-mini)
    ("f" helm-find-files)
    ("F" follow-mode)
-   ("a" (lambda ()
-          (interactive)
-          (ace-window 1)
-          (add-hook 'ace-window-end-once-hook
-                    'hydra-window/body))
-       )
+   ("a" (ace-lambda 1))
    ("v" (lambda ()
           (interactive)
           (split-window-right)
-          (windmove-right))
-       )
+          (windmove-right)))
    ("x" (lambda ()
           (interactive)
           (split-window-below)
-          (windmove-down))
-       )
-   ("s" (lambda ()
-          (interactive)
-          (ace-window 4)
-          (add-hook 'ace-window-end-once-hook
-                    'hydra-window/body)))
+          (windmove-down)))
+   ("s" (ace-lambda 4))
    ("S" save-buffer)
    ("d" delete-window)
-   ("D" (lambda ()
-          (interactive)
-          (ace-window 16)
-          (add-hook 'ace-window-end-once-hook
-                    'hydra-window/body))
-       )
- ;  ("o" delete-other-windows)
+   ("D" (ace-lambda 16))
+   ;("o" delete-other-windows)
    ("i" ace-maximize-window)
    ("z" (progn
           (winner-undo)
-          (setq this-command 'winner-undo))
-   )
+          (setq this-command 'winner-undo)))
    ("Z" winner-redo)
    ("SPC" nil)
-   )
+   ) ;; `(define hydra-window)' ends here.
+) ;;cl-macrolet ends here
    #+END_SRC
+
+   #+RESULTS:
+   : hydra-window/body
+
 ****** hydra-god-mode
  #+BEGIN_SRC emacs-lisp
 (defhydra hydra-god-mode (:body-pre (message "god mode started")
@@ -367,33 +225,35 @@ _SPC_ cancel	   	_d_elete
   ("g" hydra-god-mode/body "activate hydra-god-mode")
   ("q" nil "quit"))
 #+END_SRC
-***** here I use (map!)
+**** here I use (map!)
 #+BEGIN_SRC emacs-lisp
 (map! :leader
       (:desc "modes" "m" #'hydra-modes/body)
-      (:prefix-map ("b" . "buffer")
-                   (:desc "new buffer"            "n" #'+default/new-buffer)
-                   (:desc "kill this buffer"      "k" #'kill-this-buffer))
-      (:prefix-map ("t" . "toggle")
-                   (:prefix-map ("t" . "telega")
-                                (:desc "start telega"       "t" (lambda () (interactive) (telega t))
-                                       (:desc "telega chat with"   "c" #'telega-chat-with)
-                                       (:desc "kill telega"        "q" #'telega-kill)))
-                   (:prefix-map ("M-p" . "portage")
-                                ))
-      )
+      (:desc "hydra window" "C-w" #'hydra-window/body)
+;;      (:desc "split window below" "2" #'hydra-window/body)
+ ;;       (:desc "split window right" "3" #'split-window-right)
+       (:prefix-map ("b" . "buffer")
+                    (:desc "new buffer"            "n" #'+default/new-buffer)
+                    (:desc "kill this buffer"      "k" #'kill-this-buffer))
+       
+ ;;       (:prefix-map ("t" . "toggle")
+ ;;                    (:prefix-map ("t" . "telega")
+ ;;                                 (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
+ ;;                                 ;(:desc "start telega"       "t" #'telega)
+ ;;                                 (:desc "telega chat with"   "c" #'telega-chat-with)
+ ;;                                 (:desc "kill telega"        "q" #'telega-kill)))
+ ;;       (:prefix-map ("M-p" . "portage")
+ ;;                    ))
+)
 #+END_SRC
+
 **** global keys
  #+BEGIN_SRC emacs-lisp
  (global-set-key (kbd "C-\\") #'undo)
  #+END_SRC
-<<<<<<< Updated upstream
-
-=======
 ** EXWM configuration
-*** exwmsw configuration
- map where the workspaces shall be
  #+BEGIN_SRC emacs-lisp
+ ;map where the workspaces shall be
  (setq exwmsw-active-workspace-plist
        '("HDMI-1" 0 "HDMI-2" 0
          "LVDS-1" 1 "HDMI-2" 1
@@ -405,8 +265,9 @@ _SPC_ cancel	   	_d_elete
          "LVDS-1" 7 "HDMI-2" 7))
  (setq exwmsw-the-right-screen "LVDS1")
  (setq exwmsw-the-center-screen "HDMI-2")
+ (require 'exwm-systemtray)
+ (exwm-systemtray-enable)
  #+END_SRC
->>>>>>> Stashed changes
 
 *** define some helper functions
  efs stands for emacs from scratch since I +stole+ /borrowed/ this part from system crafters.
@@ -414,117 +275,7 @@ _SPC_ cancel	   	_d_elete
  #+BEGIN_SRC emacs-lisp
 (defun efs/exwm-init-hook ()
   ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
-  (xmobar-mode))
- #+END_SRC
-*** main exwm configuration
-#+BEGIN_SRC emacs-lisp
- (use-package exwm
-   :config
-   ;; Set the default number of workspaces
-   (setq exwm-workspace-number 9)
-
-   ;; When EXWM starts up, do some extra confifuration
-   (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
-
-   ;; NOTE: Uncomment the following two options if you want window buffers
-   ;;       to be available on all workspaces!
-
-
-   (setq exwm-layout-show-all-buffers t ; Automatically move EXWM buffer to current workspace when selected
-         exwm-workspace-show-all-buffers t ; Display all EXWM buffers in every workspace buffer list
-    )
-
-   ;; Set the screen resolution (update this to be the correct resolution for your screen!)
-   (require 'exwm-randr)
-   (exwm-randr-enable)
-
-   ;; This will need to be updated to the name of a display!  You can find
-   ;; the names of your displays by looking at arandr or the output of xrandr
-      (setq exwm-randr-workspace-monitor-plist '(0 "HDMI-1"
-                                                 1 "HDMI-2"
-                                                 2 "HDMI-2"
-                                                 3 "HDMI-2"
-                                                 4 "HDMI-2"
-                                                 5 "VGA1-1"
-                                                 6 "LVDS-1"
-                                                 7 "LVDS-1"
-                                                 8 "LVDS-1"
-                                                 9 "LVDS-1"))
-   ;; Automatically send the mouse cursor to the selected workspace's display
-   (setq exwm-workspace-warp-cursor t)
-
-   ;; Window focus should follow the mouse pointer
-   (setq mouse-autoselect-window t
-         focus-follows-mouse t)
-
-   ;; Ctrl+Q will enable the next key to be sent directly
-   (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-
-   ;; Set up global key bindings.  These always work, no matter the input state!
-   ;; Keep in mind that changing this list after EXWM initializes has no effect.
-   (setq exwm-input-global-keys
-         `(
-           ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-           (,(kbd "s-r") . exwm-reset)
-
-           ;; Move between windows
-            (,(kbd "s-h") . windmove-left)
-            (,(kbd "s-l") . windmove-right)
-            (,(kbd "s-k") . windmove-up)
-            (,(kbd "s-j") . windmove-down)
-            (,(kbd "s-H") . shrink-window-horizontally)
-            (,(kbd "s-L") . enlarge-window-horizontally)
-
-           ;; Launch applications via shell command
-           (,(kbd "s-p") . (lambda (command)
-                        (interactive (list (read-shell-command "$ ")))
-                        (start-process-shell-command command nil command)))
-
-           ;; Switch workspace
-           (,(kbd "s-w") . exwm-workspace-switch)
-           (,(kbd "s-v") . +vterm/toggle)
-           ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
-           ,@(mapcar (lambda (i)
-                       `(,(kbd (format "s-%d" i)) .
-                         (lambda ()
-                           (interactive)
-                           (exwm-workspace-switch-create ,i))))
-                     (number-sequence 0 9))))
-
-     (exwm-input-set-key (kbd "s-SPC")  #'eshell)
-     (exwm-input-set-key (kbd "s-<return>") (lambda ()
-                                         (interactive)
-                                         (+vterm/here "~/")))
-
-     (cl-macrolet ((bwrapper (file &optional (title file))
-                        `(lambda () (interactive)
-                           (start-process-shell-command
-                            ,title nil (expand-file-name ,file "~/.local/bin/"))))
-                   (start (name)
-                          `(lambda () (interactive)
-                             (start-process ,name nil ,name))))
-       (map! :leader
-             (:prefix-map ("x" . "X11 applications")
-                          (:desc "brave wrapped"         "b" (bwrapper "brave"))
-                          (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
-                          (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
-                          (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
-                          (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
-                          (:desc "librewolf unwrapped"   "l" (start "librewolf"))
-                          ))
-                   )
-) ; (use-package) exwm ends here
- #+END_SRC
-** EXWM config
-*** define some helper functions
- efs stands for emacs from scratch since I +stole+ /borrowed/ this part from system crafters.
- but here they stand for exwm function sex
- #+BEGIN_SRC emacs-lisp
-(defun efs/exwm-init-hook ()
-  ;; Make workspace 1 be the one where we land at startup
-  (exwm-workspace-switch-create 1)
-  (xmobar-mode))
+  (exwm-workspace-switch-create 1))
 
 (defun efs/exwm-update-class ()
   (exwm-workspace-rename-buffer exwm-class-name))
@@ -539,10 +290,8 @@ _SPC_ cancel	   	_d_elete
   (let* ((pos (frame-position))
          (pos-x (car pos))
           (pos-y (cdr pos)))
-    (exwm-floating-move (- pos-x) (- pos-y))))
 
- (add-hook 'exwm-mode-hook '(lambda ()
-                              (local-set-key (kbd "C-x C-b") #'consult-buffer)))
+    (exwm-floating-move (- pos-x) (- pos-y))))
 
  (use-package exwm
    :config
@@ -605,25 +354,24 @@ _SPC_ cancel	   	_d_elete
    (setq exwm-input-global-keys
          `(
            ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
-           ([?\s-r] . exwm-reset)
+           (,(kbd "s-r") . exwm-reset)
 
            ;; Move between windows
-            ([?\s-h] . windmove-left)
-            ([?\s-l] . windmove-right)
-            ([?\s-k] . windmove-up)
-            ([?\s-j] . windmove-down)
-            ([?\s-H] . shrink-window-horizontally)
-            ([?\s-L] . enlarge-window-horizontally)
+            (,(kbd "s-h") . windmove-left)
+            (,(kbd "s-l") . windmove-right)
+            (,(kbd "s-k") . windmove-up)
+            (,(kbd "s-j") . windmove-down)
+            (,(kbd "s-H") . shrink-window-horizontally)
+            (,(kbd "s-L") . enlarge-window-horizontally)
 
            ;; Launch applications via shell command
-           ([?\s-p] . (lambda (command)
+           (,(kbd "s-p") . (lambda (command)
                         (interactive (list (read-shell-command "$ ")))
                         (start-process-shell-command command nil command)))
 
            ;; Switch workspace
-           ([?\s-w] . exwm-workspace-switch)
-           ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
-           ([?\s-v] . +vterm/toggle)
+           (,(kbd "s-w") . exwm-workspace-switch)
+           (,(kbd "s-v") . +vterm/toggle)
            ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
            ,@(mapcar (lambda (i)
                        `(,(kbd (format "s-%d" i)) .
@@ -632,28 +380,23 @@ _SPC_ cancel	   	_d_elete
                            (exwm-workspace-switch-create ,i))))
                      (number-sequence 0 9))))
 
-     (exwm-input-set-key (kbd "s-SPC")  #'eshell)
-     (exwm-input-set-key (kbd "s-<return>") (lambda ()
-                                         (interactive)
-                                         (+vterm/here "~/")))
-
      (cl-macrolet ((bwrapper (file &optional (title file))
-                             `(lambda () (interactive)
-                                (start-process-shell-command
-                                 ,title nil (expand-file-name ,file "~/.local/bin/"))))
+                        `(lambda () (interactive)
+                           (start-process-shell-command
+                            ,title nil (expand-file-name ,file "~/.local/bin/"))))
                    (start (name)
                           `(lambda () (interactive)
                              (start-process ,name nil ,name))))
-       (map! :leader
-             (:prefix-map ("x" . "X11 applications")
-                          (:desc "brave wrapped"         "b" (bwrapper "brave"))
-                          (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
-                          (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
-                          (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
-                          (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
-                          (:desc "librewolf unwrapped"   "l" (start "librewolf"))
-                          ))
-       )
+                          (map! :leader
+                         (:prefix-map ("x" . "X11 applications")
+                                      (:desc "brave wrapped"         "b" (bwrapper "brave"))
+                                      (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
+                                      (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
+                                      (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
+                                      (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
+                                      (:desc "librewolf unwrapped"   "l" (start "librewolf"))
+                                      ))
+                   )
 )
 
  #+END_SRC
@@ -661,7 +404,7 @@ _SPC_ cancel	   	_d_elete
  this some configuration for telega
 
  #+BEGIN_SRC emacs-lisp
-;; (setq telega-server-libs-prefix "/usr")
+ (setq telega-server-libs-prefix "/usr")
  (add-hook 'telega-load-hook 'telega-notifications-mode)
  (add-hook 'telega-load-hook 'telega-appindicator-mode)
  (setq telega-appindicator-use-labels t)
@@ -669,7 +412,7 @@ _SPC_ cancel	   	_d_elete
  ;(setq telega-chat-input-markups '(nil "org" "markdown2"))
  (setq telega-chat-input-markups '("org" "markdown2"))
  (setq telega-directory (concat (getenv "XDG_DATA_HOME") "/telega"))
- (setq telega-emoji-font-family "TerminessTTF Nerd Font")
- (setq telega-emoji-use-images 'nil)
+ (setq telega-emoji-font-family "Iosevka Nerd Font")
+ (setq telega-emoji-use-images t)
  (add-hook 'telega-chat-mode-hook 'toggle-truncate-lines)
 #+END_SRC
