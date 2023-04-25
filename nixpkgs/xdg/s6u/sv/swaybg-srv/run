@@ -1,6 +1,0 @@
-#!/bin/execlineb -P
-envfile /etc/s6/config/user-services.conf
-importas -i WAYLAND_DISPLAY WAYLAND_DISPLAY
-importas -i HOME HOME
-fdmove -c 2 1
-swaybg -i ${HOME}/documents/Pictures/walls/xenoblade2.jpg -m fill

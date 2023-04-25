@@ -1,5 +1,0 @@
-#!/bin/execlineb -P
-#redirfd -w 1 /dev/null pipewire
-envfile /etc/s6/config/user-services.conf
-
-fdmove -c 2 1 pipewire

@@ -1,9 +1,0 @@
-#!/bin/execlineb -P
-envfile /etc/s6/config/user-services.conf
-importas -i XDG_RUNTIME_DIR XDG_RUNTIME_DIR
-importas -i DISPLAY WDISPLAY
-importas -i WAYLAND_DISPLAY WAYLAND_DISPLAY
-importas -i XDG_CONFIG_HOME XDG_CONFIG_HOME
-importas -i XDG_CURRENT_DESKTOP XDG_CURRENT_DESKTOP
-fdmove -c 2 1
-waybar

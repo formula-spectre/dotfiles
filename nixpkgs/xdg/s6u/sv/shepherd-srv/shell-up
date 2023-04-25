@@ -1,2 +1,0 @@
-#!/bin/sh
-env XDG_RUNTIME_DIR="/tmp/${whoami}.run.d" s6-fghack shepherd

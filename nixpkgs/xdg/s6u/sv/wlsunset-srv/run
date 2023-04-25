@@ -1,5 +1,0 @@
-#!/bin/execlineb -P
-envfile /etc/s6/config/user-services.conf
-importas DISPLAY DISPLAY
-importas WAYLAND_DISPLAY WAYLAND_DISPLAY
-fdmove -c 2 1 wlsunset -t 2500
