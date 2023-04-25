@@ -19,7 +19,7 @@
 ;(package! exwm)
 (package! dot-mode)
 ;(package! mu4e)
-;(package! cyberpunk-theme)
+(package! cyberpunk-theme)
 ;(package! wand)
 (package! hydra)
 (package! avy)
@@ -28,6 +28,7 @@
 (package! frog-jump-buffer)
 ;(package! polymode)
 ;(package! poly-org)
+(package! org-auto-tangle)
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format

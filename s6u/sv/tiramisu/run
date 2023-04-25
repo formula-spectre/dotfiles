@@ -1,2 +1,2 @@
 #!/bin/execlineb -P
-tiramisu
+redirfd -wnb 1 /tmp/noti-fifo tiramisu

@@ -136,3 +136,4 @@ xmonad/lib/Theme/*.o
 termonad/termonad
 termonad/termonad.hi
 termonad/termonad.o
+Windscribe

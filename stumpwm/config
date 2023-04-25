@@ -13,14 +13,22 @@
     "Toggle the swank server on/off"
     (if server-running
 	(progn
+<<<<<<< Updated upstream
 	  (swank:stop-server 4005)
+=======
+	  (slynk:stop-server 4005)
+>>>>>>> Stashed changes
 	  (echo-string
 	   (current-screen)
 	   "Stopping swank.")
 	  (setf server-running nil))
 	(progn
+<<<<<<< Updated upstream
 	  (swank:create-server :port 4005
 			       :style swank:*communication-style*
+=======
+	  (slynk:create-server :port 4005
+>>>>>>> Stashed changes
 			       :dont-close t)
 	  (echo-string
 	   (current-screen)
@@ -28,6 +36,7 @@
 	  (setf server-running t)))))
 
 (defvar *background* "#000000")
+(set-module-dir "/usr/share/common-lisp/source/stumpwm-contrib/")
 (defvar *foreground* "#FFFFFF")
 
 (defmacro emacs-cmd (name emacs-command)
@@ -49,12 +58,19 @@
 
 (defvar *my-application-keymap*
   (let ((m (make-sparse-keymap)))
+    (mmap m "b" "exec ~/.local/bin/brave")
+    (mmap m "d" "exec ~/.local/bin/deltachat")
+    (mmap m "w" "exec ~/.local/bin/whatsdesk")
     (mmap m "l" "exec librewolf")
+<<<<<<< Updated upstream
     (mmap m "c" "exec chromium")
     (mmap m "s" "exec slack")
     (mmap m "t" "exec boxxy thunderbird")
     (mmap m "C-t" "exec trello")
     (mmap m "C-a" "exec trello exec boxxy thunderbird exec slack")
+=======
+    (mmap m "M-l" "exec ~/.local/bin/lycheeslicer")
+>>>>>>> Stashed changes
   m))
 
 (defvar *emacs-application-keymap*
@@ -69,7 +85,7 @@
   (which-key-mode))
 
 (mmap *root-map* "x"       '*my-application-keymap*)
-(mmap *root-map* "1"       "remove-split")
+(mmap *root-map* "1"       "only")
 (mmap *root-map* "2"       "vsplit")
 (mmap *root-map* "3"       "hsplit")
 (mmap *root-map* "0"       "remove-split")
@@ -111,7 +127,6 @@
 (load-module "mem")
 
 (setf cpu::*cpu-modeline-fmt*        "%c"
-      cpu::*cpu-usage-modeline-fmt*  "~A~2D%"
       mem::*mem-modeline-fmt*        "%a%p"
       *hidden-window-color*          "^**"
       *mode-line-highlight-template* "«~A»")
@@ -123,11 +138,13 @@
             "^>"
             "[%d]"
             "[CPU:%C]"
-            "[MEM:%M]"
-;            "[BAT:%B]"
+            "[%M]"
+            "[BAT:%B]"
+            "%T"
             ))
 
 (when *initializing*
+<<<<<<< Updated upstream
   (progn
     (sb-ext:run-program "sh" '("~/.fehbg"))
     (sb-ext:run-program "keynav" '())
@@ -137,3 +154,6 @@
   (mode-line))
 (load-module "stumptray")
 (stumptray::stumptray)
+=======
+  (run-shell-command "xmobar"))
+>>>>>>> Stashed changes

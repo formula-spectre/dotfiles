@@ -38,7 +38,11 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
 #+END_SRC
 *** General appearence
 #+BEGIN_SRC emacs-lisp
+<<<<<<< Updated upstream
 (setq doom-theme 'cyberpunk     )
+=======
+(setq doom-theme 'cyberpunk)
+>>>>>>> Stashed changes
 (setq doom-line-numbers-style 'relative)
 (setq display-line-numbers-type 'relative)
  (setq org-directory "~/org/")
@@ -95,7 +99,22 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
 (setq circe-reduce-lurker-spam t)
 (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
 #+END_SRC
+** org-auto-tangle configuration
+#+BEGIN_SRC emacs-lisp
+(use-package org-auto-tangle
+  :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
+  :defer t
+  :hook (org-mode . org-auto-tangle-mode))
+#+END_SRC
 ** misc stuff
+<<<<<<< Updated upstream
+=======
+#+BEGIN_SRC emacs-lisp
+ (setq org-directory "~/org/")
+ (load! (concat (getenv "DOOMDIR") "/private"))
+
+#+END_SRC
+>>>>>>> Stashed changes
 *** frog-jumper configuration
 #+BEGIN_SRC emacs-lisp
 (use-package frog-jump-buffer :ensure t)
@@ -275,6 +294,7 @@ _SPC_ cancel	  	_d_elete
  #+BEGIN_SRC emacs-lisp
 (defun efs/exwm-init-hook ()
   ;; Make workspace 1 be the one where we land at startup
+<<<<<<< Updated upstream
   (exwm-workspace-switch-create 1))
 
 (defun efs/exwm-update-class ()
@@ -293,11 +313,19 @@ _SPC_ cancel	  	_d_elete
 
     (exwm-floating-move (- pos-x) (- pos-y))))
 
+=======
+  (exwm-workspace-switch-create 1)
+  (xmobar-mode))
+ #+END_SRC
+*** main exwm configuration
+#+BEGIN_SRC emacs-lisp
+>>>>>>> Stashed changes
  (use-package exwm
    :config
    ;; Set the default number of workspaces
    (setq exwm-workspace-number 9)
 
+<<<<<<< Updated upstream
    ;; When window "class" updates, use it to set the buffer name
    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
 
@@ -307,12 +335,15 @@ _SPC_ cancel	  	_d_elete
    ;; Configure windows as they're created
    ;(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
 
+=======
+>>>>>>> Stashed changes
    ;; When EXWM starts up, do some extra confifuration
    (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
 
    ;; NOTE: Uncomment the following two options if you want window buffers
    ;;       to be available on all workspaces!
 
+<<<<<<< Updated upstream
    ;; Automatically move EXWM buffer to current workspace when selected
    (setq exwm-layout-show-all-buffers t)
 
@@ -322,6 +353,12 @@ _SPC_ cancel	  	_d_elete
    ;; NOTE: Uncomment this option if you want to detach the minibuffer!
    ;; Detach the minibuffer (show it with exwm-workspace-toggle-minibuffer)
    ;;(setq exwm-workspace-minibuffer-position 'top)
+=======
+
+   (setq exwm-layout-show-all-buffers t ; Automatically move EXWM buffer to current workspace when selected
+         exwm-workspace-show-all-buffers t ; Display all EXWM buffers in every workspace buffer list
+    )
+>>>>>>> Stashed changes
 
    ;; Set the screen resolution (update this to be the correct resolution for your screen!)
    (require 'exwm-randr)
@@ -380,6 +417,14 @@ _SPC_ cancel	  	_d_elete
                            (exwm-workspace-switch-create ,i))))
                      (number-sequence 0 9))))
 
+<<<<<<< Updated upstream
+=======
+     (exwm-input-set-key (kbd "s-SPC")  #'eshell)
+     (exwm-input-set-key (kbd "s-<return>") (lambda ()
+                                         (interactive)
+                                         (+vterm/here "~/")))
+
+>>>>>>> Stashed changes
      (cl-macrolet ((bwrapper (file &optional (title file))
                         `(lambda () (interactive)
                            (start-process-shell-command
@@ -387,6 +432,7 @@ _SPC_ cancel	  	_d_elete
                    (start (name)
                           `(lambda () (interactive)
                              (start-process ,name nil ,name))))
+<<<<<<< Updated upstream
                           (map! :leader
                          (:prefix-map ("x" . "X11 applications")
                                       (:desc "brave wrapped"         "b" (bwrapper "brave"))
@@ -400,6 +446,21 @@ _SPC_ cancel	  	_d_elete
 )
 
  #+END_SRC
+=======
+       (map! :leader
+             (:prefix-map ("x" . "X11 applications")
+                          (:desc "brave wrapped"         "b" (bwrapper "brave"))
+                          (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
+                          (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
+                          (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
+                          (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
+                          (:desc "librewolf unwrapped"   "l" (start "librewolf"))
+                          ))
+                   )
+) ; (use-package) exwm ends here
+ #+END_SRC
+***
+>>>>>>> Stashed changes
 ** telega configuration
  this some configuration for telega
 
