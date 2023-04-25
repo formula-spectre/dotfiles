@@ -1,0 +1,29 @@
+-- Xmobar (http://projects.haskell.org/xmobar/)-
+-- This is one my xmobar.hs but not compiled version
+Config { font            = "xft:Iosevka Nerd Font:italic:pixelsize=12:antialias=true:hinting=true"
+       , bgColor      = "#000000"
+       , fgColor      = "#FFFFFF"
+       , position     = TopH 20
+       , border       = FullB
+       , borderColor  = "#FFFFFF"
+       , lowerOnStart = True
+       , hideOnStart  = False
+       , allDesktops  = True
+       , persistent   = True
+       , iconRoot     = "."
+       , commands = [
+
+                      Run Cpu ["-t", "CPU:(<total>%)","-H","50","--high","red"] 20
+                    , Run ThermalZone 0 ["-t", "TEMP:<temp>C"] 20
+                    , Run Memory ["-t", "RAM:<used>M:(<usedratio>%)"] 2
+                    , Run BatteryP ["BAT0"] ["-t", "BAT:<acstatus> <left>%(<timeleft>)"] 10
+                    , Run Date "%b %a %d (%H:%M:%S)" "date" 1
+                    , Run Com "/bin/bash" ["-c", "~/.config/xmobar/tray"] "tray" 20
+                    , Run Com "/bin/bash" ["-c", "~/.config/xmobar/online"] "online" 400
+                    , Run CommandReader "~/.config/xmobar/tiramisu" "tiramisu"
+
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = " <icon=./haskell_20.xpm/> <box type=Bottom width=2 mb=4>Metroplex: %online%</box> ::<action=`killall herbe`>%tiramisu%</action>:: } %date% {[%battery%][%thermal0%][%cpu%][%memory%]%tray%"
+       }
