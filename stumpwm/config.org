@@ -1,17 +1,9 @@
-<<<<<<< Updated upstream
-=======
-;; -*- mode: org -*-
->>>>>>> Stashed changes
 #+TITLE: Stumpwm configuration
 #+AUTHOR: Cloud Strife (Spektrum_light, gear-piped, purity-interface, topological android GAR-XB/G-3778 id: MGlIGTfxzZ formula-spectre)
 #+PROPERTY: header-args :tangle "~/.config/stumpwm/config" :mkdirp t :shebang ";; -*- mode: lisp -*- \n"
 #+auto_tangle: t
-<<<<<<< Updated upstream
 *  this is my stumpwm configuration. batteries included, but not charged. please escuse my wonkiness on common lisp.  feel free to take this as inspiration and/or contribute!
 
-=======
-  this is my stumpwm configuration. batteries included, but not charged. please escuse my wonkiness on common lisp.  feel free to take this as inspiration and/or contribute!
->>>>>>> Stashed changes
 ** load quicklisp
 #+BEGIN_SRC lisp
 #-quicklisp
@@ -23,40 +15,47 @@
 
 ** load slynk/swank
 #+BEGIN_SRC lisp
-(ql:quickload :slynk)
-(ql:quickload :swank)
+(ql:quickload '(:slynk
+                :alexandria
+                :xembed))
+
+(swank-loader:init)
 (let ((server-running nil))
   (defcommand slynk () ()
     "Toggle the swank server on/off"
     (if server-running
-	(progn
-<<<<<<< Updated upstream
-	  (swank:stop-server 4005)
-=======
-	  (slynk:stop-server 4005)
->>>>>>> Stashed changes
-	  (echo-string
-	   (current-screen)
-	   "Stopping swank.")
-	  (setf server-running nil))
-	(progn
-<<<<<<< Updated upstream
-	  (swank:create-server :port 4005
-			       :style swank:*communication-style*
-=======
-	  (slynk:create-server :port 4005
->>>>>>> Stashed changes
-			       :dont-close t)
-	  (echo-string
-	   (current-screen)
-	   "Starting swank. M-x slime-connect RET RET, then (in-package stumpwm).")
-	  (setf server-running t)))))
-#+END_SRC
+        (progn
+          (slynk:stop-server 4005)
+          (echo-string
+           (current-screen)
+           "Stopping slynk.")
+          (setf server-running nil))
+        (progn
+          (slynk:create-server :port 4005
+                               :dont-close t)
+          (echo-string
+           (current-screen)
+           "Starting slynk. M-x sly-connect RET RET, then (in-package stumpwm).")
+          (setf server-running t)))))
+;; smol commnad to open a repl automagically (the window-send-string part does not work yet)
+(defcommand emacs-auto-slynk () ()
+  (slynk)
+  (emacs)
+  (meta (kbd "M-x"))
+  (window-send-string "sly-connect")
+  (meta (kbd "RET"))
+  (meta (kbd "RET"))
+  (meta (kbd "RET"))
+;  (window-send-string "(in-package :stumpwm)")
+  (meta (kbd "RET")))
 
+#+END_SRC
+** load some modules
+#+BEGIN_SRC lisp
+#+END_SRC
 ** define some colors.
 #+BEGIN_SRC lisp
 (defvar *background* "#000000")
-(set-module-dir "/usr/share/common-lisp/source/stumpwm-contrib/")
 (defvar *foreground* "#FFFFFF")
 #+END_SRC
 ** macros!
@@ -67,7 +66,7 @@
     `(defcommand ,name () ()
        (emacs)
        (meta (kbd "M-x"))
-..»       (window-send-string ,emacs-command)
+       (window-send-string ,emacs-command)
        (meta (kbd "RET"))))
 #+END_SRC
 **** emacs commands
@@ -81,7 +80,11 @@
   "a macro to make binding easier"
   `(define-key ,map (kbd ,key) ,command))
 #+END_SRC
-
+*** make a macro for the alexandria-curry function
+#+BEGIN_SRC lisp
+(defmacro curry (map)
+  `(alexandria:curry #'define-key ,map))
+#+END_SRC
 **  keybindings
 ***  make focus follow mouse
 #+BEGIN_SRC lisp
@@ -92,28 +95,26 @@
 #+BEGIN_SRC lisp
 (defvar *my-application-keymap*
   (let ((m (make-sparse-keymap)))
-    (mmap m "b" "exec ~/.local/bin/brave")
-    (mmap m "d" "exec ~/.local/bin/deltachat")
-    (mmap m "w" "exec ~/.local/bin/whatsdesk")
-    (mmap m "l" "exec librewolf")
-<<<<<<< Updated upstream
-    (mmap m "c" "exec chromium")
-    (mmap m "s" "exec slack")
-    (mmap m "t" "exec boxxy thunderbird")
-    (mmap m "C-t" "exec trello")
-    (mmap m "C-a" "exec trello exec boxxy thunderbird exec slack")
-=======
-    (mmap m "M-l" "exec ~/.local/bin/lycheeslicer")
->>>>>>> Stashed changes
-  m))
+    (dolist
+        (my-application-map `(
+                              (,(kbd "l")   "exec librewolf")
+                              (,(kbd "c")   "exec chromium")
+                              (,(kbd "s")   "exec slack")
+                              (,(kbd "t")   "exec boxxy thunderbird")
+                              (,(kbd "C-t") "exec trello")
+                              (,(kbd "d")   "exec dolphin")))
+      (apply (curry m) my-application-map))))
 #+END_SRC
 *** define a custom keymap for emacs commands
 #+BEGIN_SRC lisp
 (defvar *emacs-application-keymap*
-   (let ((m (make-sparse-keymap)))
-    (mmap m "m" "emacs-magit")
-    (mmap m "c" "emacs-calendar")
-  m))
+  (let ((m (make-sparse-keymap)))
+    (dolist
+        (emacs-map `(
+                     (,(kbd "m") "emacs-magit")
+                     (,(kbd "c") "emacs-calendar")
+                     (,(kbd "C-s") "emacs-auto-slynk")))
+      (apply (curry m) emacs-map))))
 
 #+END_SRC
 *** set the prefix to mod-x, to emulate emacs.
@@ -127,32 +128,41 @@
 #+END_SRC
 *** *root-map* keybindings, aka prefixed ones (see prefix-key)
 #+BEGIN_SRC lisp
-(mmap *root-map* "x"       '*my-application-keymap*)
-(mmap *root-map* "1"       "only")
-(mmap *root-map* "2"       "vsplit")
-(mmap *root-map* "3"       "hsplit")
-(mmap *root-map* "0"       "remove-split")
-(mmap *root-map* "s-b"     "windowlist")
-(mmap *root-map* "s"       "slynk")
-(mmap *root-map* "d"       "time")
-(mmap *root-map* "RET"     "exec emacsclient -ce '(eshell)'")
-(mmap *root-map* "C-RET"   "exec emacsclient -ce '(+stumpish-vterm/here)'")
-(mmap *root-map* "s-h"     "move-window left")
-(mmap *root-map* "s-j"     "move-window down")
-(mmap *root-map* "s-k"     "move-window up")
-(mmap *root-map* "s-l"     "move-window right")
-(mmap *root-map* "C-e"      '*emacs-application-keymap*)
+(undefine-key *root-map* (kbd "x"))
+(dolist
+    (root-map-bindings `(
+                         (,(kbd "x")       ,*my-application-keymap*)
+                         (,(kbd "1")       "only")
+                         (,(kbd "2")       "vsplit")
+                         (,(kbd "3")       "hsplit")
+                         (,(kbd "0")       "remove-split")
+                         (,(kbd "s-b")     "windowlist")
+                         (,(kbd "s")       "slynk")
+                         (,(kbd "S")        "eval (stumptray::stumptray)")
+                         (,(kbd "d")       "time")
+                         (,(kbd "M")       "mode-line")
+                         (,(kbd "C-RET")   "exec emacsclient -ce '(comint-stumpish)'")
+                         (,(kbd "s-h")     "move-window left")
+                         (,(kbd "s-j")     "move-window down")
+                         (,(kbd "s-k")     "move-window up")
+                         (,(kbd "s-l")     "move-window right")
+                         (,(kbd "C-e")      ,*emacs-application-keymap*)))
+  (apply (curry *root-map*) root-map-bindings))
 #+END_SRC
 *** *top-level* keybindings, aka with no prefix
 #+BEGIN_SRC lisp
-(mmap *top-map*  "s-RET"     "exec emacsclient -ce '(+vterm/here \"~/\")'")
-(mmap *top-map*  "s-h"       "move-focus left")
-(mmap *top-map*  "s-j"       "move-focus down")
-(mmap *top-map*  "s-k"       "move-focus up")
-(mmap *top-map*  "s-l"       "move-focus right")
-(mmap *top-map*  "s-p"       "exec")
-(mmap *top-map*  "s-r"       "loadrc")
-(mmap *top-map*  "s-:"       "eval")
+(dolist
+    (bindings `(
+                (,(kbd "s-RET")     "exec emacsclient -ce '(+vterm/here \"~/\")'")
+                (,(kbd "s-h")       "move-focus left")
+                (,(kbd "s-j")       "move-focus down")
+                (,(kbd "s-k")       "move-focus up")
+                (,(kbd "s-l")       "move-focus right")
+                (,(kbd "s-p")       "exec")
+                (,(kbd "s-r")       "loadrc")
+                (,(kbd "s-:")       "eval")
+                (,(kbd "s-i")       "show-clipboard-history")))
+  (apply (curry *top-map*) bindings))
 #+END_SRC
 **  modeline
 **** formatting
@@ -175,56 +185,44 @@ here I format most of the modeline.
 #+END_SRC
 **** load some modules
 #+BEGIN_SRC lisp
-(load-module "battery-portable")
-(load-module "cpu")
-(load-module "mem")
+(mapc #'load-module '("battery-portable"
+                      "cpu"
+                      "mem"
+                      "clipboard-history"
+                      "stumptray"))
 #+END_SRC
 **** format the various elements of the modeline
 #+BEGIN_SRC lisp
-(setf cpu::*cpu-modeline-fmt*        "%c"
+(setf cpu::*cpu-modeline-fmt*        "%c:%f TEMP:%t "
       mem::*mem-modeline-fmt*        "%a%p"
       *hidden-window-color*          "^**"
-      *mode-line-highlight-template* "«~A»")
+      *mode-line-highlight-template* "<<~A>>")
 #+END_SRC
 *** format the status line
 #+BEGIN_SRC lisp
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 (setf stumpwm:*screen-mode-line-format*
-      (list ;;"[%g]"
+      (list "[%g]"
             "[%W]"
             "[%w]"
             "^>"
             "[%d]"
-            "[CPU:%C]"
-            "[%M]"
-            "[BAT:%B]"
+            "[%C]"
+            "[MEM:%M]"
+            "|"
             "%T"
+            "|"
             ))
 #+END_SRC
-<<<<<<< Updated upstream
-
-
 ** initalization
 things that have to be ran on startup.
 the dbus thing is a crutch.
 #+BEGIN_SRC lisp
 (when *initializing*
   (progn
-    (sb-ext:run-program "sh" '("~/.fehbg"))
-    (sb-ext:run-program "keynav" '())
-    (mode-line)))
+    (mode-line)
+    (run-shell-command "~/.fehbg")))
 
-(unless (mode-line)
-  (mode-line))
-(load-module "stumptray")
 (stumptray::stumptray)
-=======
-** initialization
-#+BEGIN_SRC lisp
-(when *initializing*
-  (run-shell-command "xmobar"))
->>>>>>> Stashed changes
+(clipboard-history:start-clipboard-manager)
 #+END_SRC
