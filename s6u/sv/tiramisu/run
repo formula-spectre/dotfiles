@@ -1,2 +1,8 @@
-#!/bin/execlineb -P
-redirfd -wnb 1 /tmp/noti-fifo tiramisu
+#!/bin/sh
+importas DISPLAY DISPLAY
+[ ! -e noti-log ] && touch /tmp/noti-log
+tiramisu -j |
+    while read -r noti; do
+      echo "$noti" | jq -r --unbuffered '.source+" "+.summary+" "+.body' | cut -c1-50 > /tmp/noti-log
+      /usr/bin/herbe "$(echo "$noti" |jq -r --unbuffered '.source,.summary,.body' )" &
+    done

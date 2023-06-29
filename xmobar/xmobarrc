@@ -12,18 +12,18 @@ Config { font            = "xft:Iosevka Nerd Font:italic:pixelsize=12:antialias=
        , persistent   = True
        , iconRoot     = "."
        , commands = [
-
-                      Run Cpu ["-t", "CPU:(<total>%)","-H","50","--high","red"] 20
+                      Run Com "/bin/bash" ["-c", "~/.config/xmobar/online"] "online" 400
+                    , Run Cpu ["-t", "CPU:(<total>%)","-H","50","--high","red"] 20
                     , Run ThermalZone 0 ["-t", "TEMP:<temp>C"] 20
                     , Run Memory ["-t", "RAM:<used>M:(<usedratio>%)"] 2
                     , Run BatteryP ["BAT0"] ["-t", "BAT:<acstatus> <left>%(<timeleft>)"] 10
                     , Run Date "%b %a %d (%H:%M:%S)" "date" 1
+                    --, Run CommandReader "~/.config/xmobar/scripts/tiramisu.sh" "tiramisu"
+                    , Run Com "/bin/bash" ["-c","~/.config/xmobar/scripts/tiramisu.sh"] "tiramisu" 5
                     , Run Com "/bin/bash" ["-c", "~/.config/xmobar/tray"] "tray" 20
-                    , Run Com "/bin/bash" ["-c", "~/.config/xmobar/online"] "online" 400
-                    , Run CommandReader "~/.config/xmobar/tiramisu" "tiramisu"
-
+                    , Run Swap ["-t", "SWP:<usedratio>%"]  10
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = " <icon=./haskell_20.xpm/> <box type=Bottom width=2 mb=4>Metroplex: %online%</box> ::<action=`killall herbe`>%tiramisu%</action>:: } %date% {[%battery%][%thermal0%][%cpu%][%memory%]%tray%"
+       , template = " <icon=./haskell_20.xpm/> <box type=Bottom width=2 mb=4>Metroplex: %online%</box> <action=`killall herbe`>::%tiramisu%::</action> } %date% {[%battery%][%thermal0%][%cpu%][%memory%][%swap%]%tray%"
        }

@@ -15,7 +15,6 @@ in
      ];
      sessionVariables = {
        NIX_PATH="/home/${USER}/.nix-defexpr/channels";
-       #PATH="$PATH:/home/${USER}/.nix-profile/bin/:/home/${USER}/.local/bin/";
        TERM="xterm";
        BROWSER="${BROWSER}";
        XDG_CONFIG_HOME="/home/${USER}/.config";
@@ -66,14 +65,10 @@ in
            name = "myprofile";
            settings = {
              "media.ffmpeg.vaapi.enabled" = false;
-             "browser.newtabpage.pinned" = [{
-               title = "NixOS";
-               url = "https://nixos.org";
-             }];
            };
            extensions = with pkgs.nur.repos.rycee.firefox-addons;
              [
-               add-custom-search-engine
+               #add-custom-search-engine
                anonaddy
                browserpass
                canvasblocker
@@ -93,24 +88,26 @@ in
                snowflake
                sponsorblock
                tab-session-manager
-               temporary-containers
+               #temporary-containers
                terms-of-service-didnt-read
                vimium
                xbrowsersync
-               windscribe
+               adnauseam
+               #windscribe
              ];
          };
-       }; #profiles ends here     };#firefox ends here
+       }; #profiles ends here
+       };#firefox ends here
      lsd.enable = true;
      bat.enable = true;
      zsh = {
        completionInit = "autoload -U compinit && compinit -u";
        envExtra = ''
- source /etc/profile
- export XDG_CACHE_HOME="$HOME/.cache"
- export XDG_CONFIG_HOME="$HOME/.config"
- export XDG_DATA_HOME="$HOME/.local/share"
-
+source /etc/profile
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export PATH=$PATH:~/.nix-profile/bin:~/.local/bin #FIXME!
                   '';
        profileExtra = ''
 if [  "$(tty)" = "/dev/tty1" ] ; then
@@ -144,8 +141,11 @@ fi
        enableCompletion = true;
        enableSyntaxHighlighting = true;
        autocd = true;
-       shellAliases = {
+       shellGlobalAliases = {
+         termbin="nc termbin.com 9999";
          r="rm -rvf";
+       };
+       shellAliases = {
          cp="cp -rv";
          jobs="jobs -p";
          ls="lsd -F --color=never";
@@ -154,12 +154,12 @@ fi
          e="emacsclient -ct";
          s6-rc-user="s6-rc -l /tmp/\$\{USER\}/s6-rc";
          cat="bat";
-         termbin="nc termbin.com 9999";
          yt-mp3="youtube-dl -x --audio-format mp3 --prefer-ffmpeg";
          yt-mp4="";
          k="kubectl";
          ll="ls -l";
          l1="ls -1";
+         gc="git clone";
        };
         initExtraFirst = (
   "
@@ -182,28 +182,29 @@ fi
  source ${pkgs.deer}/share/zsh/site-functions/deer
  source \$\{ZDOTDIR\}/functions
  setopt globdots
+ autoload -U deer
+ zle -N deer
+ bindkey '\\eOP' deer
+ export PROMPT=$PROMPT$pr_shortkeys
         "
- #export PS1=\"%?%B ﬦ %n @ %~ >>=%b \"
- #       "
-       );
-       plugins = [
-         {
-           name = "zsh-auto-notify";
-           file = "auto-notify.plugin.zsh";
-           src = builtins.fetchGit {
-             url = "https://github.com/MichaelAquilina/zsh-auto-notify";
-           };
-         }
-       ];
+        );
+        plugins = [
+          {
+            name = "zsh-z";
+            file = "zsh-z.plugin.zsh";
+            src = builtins.fetchGit {
+              url = "https://github.com/agkozak/zsh-z";
+            };
+          }
+        ];
      }; # zsh ends ehre
-
      # fzf = {
      #   enable = true;
      #   enableZshIntegration = true;
      #};
    }; # programs ends here
-
    xdg = {configFile."zsh.nix/functions".text = ''
+
  agent() {
    eval $(ssh-agent)
    ssh-add "$HOME/.ssh/id_ed25519" }
@@ -230,16 +231,20 @@ fi
 
  curlhab () { curl -X POST \
      --header "Content-Type: text/plain" \
-     --header "Accept: application/json" -d "$2" "http://192.168.1.6:8080/rest/items/$1"}
+     --header "Accept: application/json" -d "$2" "http://192.168.1.4:8080/rest/items/$1"}
 
  clearcaches(){
-   echo "execlineb -Pc 'if { sync } pipeline { echo 3 } tee /proc/sys/vm/drop_caches'"
+   set -ex
    doas execlineb -Pc 'if { sync } pipeline { echo 3 } tee /proc/sys/vm/drop_caches' }
 
  aura (){
       printf "reminder: aura does not support doas yet, so i'm using sudo..\n"
       /usr/bin/sudo aura --unsuppress $* }
- '';
 
+extractgentoo (){
+      tar xpvf $* --xattrs-include='*.*' --numeric-owner
+      echo "remember to copy resolv.conf" }
+
+ '';
    };
- }
+}

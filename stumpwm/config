@@ -6,45 +6,50 @@
   (when (probe-file quicklisp-init)
     (load quicklisp-init)))
 
-(ql:quickload :slynk)
-(ql:quickload :swank)
+(ql:quickload '(:slynk
+                :alexandria
+                ))
+
 (let ((server-running nil))
   (defcommand slynk () ()
     "Toggle the swank server on/off"
     (if server-running
-	(progn
-<<<<<<< Updated upstream
-	  (swank:stop-server 4005)
-=======
-	  (slynk:stop-server 4005)
->>>>>>> Stashed changes
-	  (echo-string
-	   (current-screen)
-	   "Stopping swank.")
-	  (setf server-running nil))
-	(progn
-<<<<<<< Updated upstream
-	  (swank:create-server :port 4005
-			       :style swank:*communication-style*
-=======
-	  (slynk:create-server :port 4005
->>>>>>> Stashed changes
-			       :dont-close t)
-	  (echo-string
-	   (current-screen)
-	   "Starting swank. M-x slime-connect RET RET, then (in-package stumpwm).")
-	  (setf server-running t)))))
+        (progn
+          (slynk:stop-server 4005)
+          (echo-string
+           (current-screen)
+           "Stopping swank.")
+          (setf server-running nil))
+        (progn
+          (slynk:create-server :port 4005
+                               :dont-close t)
+          (echo-string
+           (current-screen)
+           "Starting swank. M-x sly-connect RET RET, then (in-package stumpwm).")
+          (setf server-running t)))))
 
 (defvar *background* "#000000")
 (set-module-dir "/usr/share/common-lisp/source/stumpwm-contrib/")
 (defvar *foreground* "#FFFFFF")
+
+;(ql:quickload :clx-truetype)
+;(load-module "ttf-fonts")
+;(setq clx-truetype::*font-dirs*
+;    (append (list (namestring (merge-pathnames ".local/share/fonts" (user-homedir-pathname))))
+    ;             clx-truetype::*font-dirs*))
+;(xft:cache-fonts)
+;(set-font (make-instance 'xft:font
+;                          :family "Iosevka Nerd Font"
+;                          :subfamily "Regular"
+;                          :size 8
+;                          :antialias t))
 
 (defmacro emacs-cmd (name emacs-command)
   "a macro that permits to easily define emacs commands"
     `(defcommand ,name () ()
        (emacs)
        (meta (kbd "M-x"))
-..»       (window-send-string ,emacs-command)
+       (window-send-string ,emacs-command)
        (meta (kbd "RET"))))
 
 (emacs-cmd emacs-magit    "magit")
@@ -54,106 +59,80 @@
   "a macro to make binding easier"
   `(define-key ,map (kbd ,key) ,command))
 
+(defmacro curry (map)
+  `(alexandria:curry #'define-key ,map))
+
+(load-module "pass")
+
 (setf *mouse-focus-policy* :sloppy)
 
 (defvar *my-application-keymap*
   (let ((m (make-sparse-keymap)))
-    (mmap m "b" "exec ~/.local/bin/brave")
-    (mmap m "d" "exec ~/.local/bin/deltachat")
-    (mmap m "w" "exec ~/.local/bin/whatsdesk")
-    (mmap m "l" "exec librewolf")
-<<<<<<< Updated upstream
-    (mmap m "c" "exec chromium")
-    (mmap m "s" "exec slack")
-    (mmap m "t" "exec boxxy thunderbird")
-    (mmap m "C-t" "exec trello")
-    (mmap m "C-a" "exec trello exec boxxy thunderbird exec slack")
-=======
-    (mmap m "M-l" "exec ~/.local/bin/lycheeslicer")
->>>>>>> Stashed changes
-  m))
+    (mmap m "b" "exec ~/.local/bin/bw/brave")
+    (mmap m "M-d" "exec ~/.local/bin/bw/deltachat")
+    (mmap m "d" "exec ~/.local/bin/bw/abaddon")
+    (mmap m "D" "exec ~/.local/bin/bw/discord")
+    ;(mmap m "l" "exec librewolf")
+    (mmap m "l" "exec ~/.local/bin/bw/librewolf")
+    (mmap m "M-l" "exec ~/.local/bin/bw/lycheeslicer")
+    (mmap m "s" "exec flatpak run com.valvesoftware.Steam ")
+    (mmap m "S" "exec ~/.local/bin/bw/steam")
+    (mmap m "t" "exec emacsclient -e '(telega t)'")
+    (mmap m "T" "exec emacsclient -e '(telega-kill t)'")
+    (mmap m "w" "exec ~/.local/bin/bw/whatsdesk")
+    ;(mmap m "a" "exec flatpak run com.belmoussaoui.Authenticator")
+    m))
 
 (defvar *emacs-application-keymap*
-   (let ((m (make-sparse-keymap)))
-    (mmap m "m" "emacs-magit")
-    (mmap m "c" "emacs-calendar")
-  m))
+  (let ((m (make-sparse-keymap)))
+    (dolist
+        (emacs-map `(
+                     (,(kbd "m") "emacs-magit")
+                     (,(kbd "c") "emacs-calendar")
+                     (,(kbd "C-s") "emacs-auto-slynk")))
+      (apply (curry m) emacs-map))))
 
 (set-prefix-key (kbd "s-x"))
 
 (unless (which-key-mode)
   (which-key-mode))
 
-(mmap *root-map* "x"       '*my-application-keymap*)
-(mmap *root-map* "1"       "only")
-(mmap *root-map* "2"       "vsplit")
-(mmap *root-map* "3"       "hsplit")
-(mmap *root-map* "0"       "remove-split")
-(mmap *root-map* "s-b"     "windowlist")
-(mmap *root-map* "s"       "slynk")
-(mmap *root-map* "d"       "time")
-(mmap *root-map* "RET"     "exec emacsclient -ce '(eshell)'")
-(mmap *root-map* "C-RET"   "exec emacsclient -ce '(+stumpish-vterm/here)'")
-(mmap *root-map* "s-h"     "move-window left")
-(mmap *root-map* "s-j"     "move-window down")
-(mmap *root-map* "s-k"     "move-window up")
-(mmap *root-map* "s-l"     "move-window right")
-(mmap *root-map* "C-e"      '*emacs-application-keymap*)
+(undefine-key *root-map* (kbd "x"))
 
-(mmap *top-map*  "s-RET"     "exec emacsclient -ce '(+vterm/here \"~/\")'")
-(mmap *top-map*  "s-h"       "move-focus left")
-(mmap *top-map*  "s-j"       "move-focus down")
-(mmap *top-map*  "s-k"       "move-focus up")
-(mmap *top-map*  "s-l"       "move-focus right")
-(mmap *top-map*  "s-p"       "exec")
-(mmap *top-map*  "s-r"       "loadrc")
-(mmap *top-map*  "s-:"       "eval")
+(dolist
+    (root-map `(
+                (,(kbd "x")       ,*my-application-keymap*)
+                (,(kbd "s-x")     "pull-hidden-next")
+                (,(kbd "1")       "only")
+                (,(kbd "2")       "vsplit")
+                (,(kbd "3")       "hsplit")
+                (,(kbd "0")       "remove-split")
+                (,(kbd "s-b")     "windowlist")
+                (,(kbd "s")       "slynk")
+                (,(kbd "d")       "time")
+                (,(kbd "E")       "exec emacsclient -c")
+                (,(kbd "X")        "exec killall xmobar tiramisu && xmobar")
+                (,(kbd "RET")     "exec emacsclient -ce '(eshell)'")
+                (,(kbd "C-RET")   "exec emacsclient -ce '(+stumpish-vterm/here)'")
+                (,(kbd "s-h")     "move-window left")
+                (,(kbd "s-j")     "move-window down")
+                (,(kbd "s-k")     "move-window up")
+                (,(kbd "s-l")     "move-window right")
+                (,(kbd "C-e")      ,*emacs-application-keymap*)))
+  (apply (curry *root-map*) root-map))
 
-(setf *mode-line-timeout* 1)
-(setf *time-modeline-string* "%b %a %d (%H:%M:%S)")
-;; set window title, truncate after 5 chars
-(setf *window-format* "%n: %5t")
-
-(let ((black "#000000")
-      (white "#FFFFFF"))
-  (setf *mode-line-background-color* black
-        *mode-line-foreground-color* white
-        *mode-line-border-color* white
-        *mode-line-border-width 1)
-        *mode-line-border-width 1)
-
-(load-module "battery-portable")
-(load-module "cpu")
-(load-module "mem")
-
-(setf cpu::*cpu-modeline-fmt*        "%c"
-      mem::*mem-modeline-fmt*        "%a%p"
-      *hidden-window-color*          "^**"
-      *mode-line-highlight-template* "«~A»")
-
-(setf stumpwm:*screen-mode-line-format*
-      (list ;;"[%g]"
-            "[%W]"
-            "[%w]"
-            "^>"
-            "[%d]"
-            "[CPU:%C]"
-            "[%M]"
-            "[BAT:%B]"
-            "%T"
-            ))
+(dolist
+    (top-bindings `(
+                    (,(kbd "s-RET")     "exec emacsclient -ce '(+vterm/here \"~/\")'")
+                    (,(kbd "s-h")       "move-focus left")
+                    (,(kbd "s-j")       "move-focus down")
+                    (,(kbd "s-k")       "move-focus up")
+                    (,(kbd "s-l")       "move-focus right")
+                    (,(kbd "s-p")       "exec")
+                    (,(kbd "s-r")       "loadrc")
+                    (,(kbd "s-:")       "eval")
+                    (,(kbd "s-u")       "pass:pass-copy")))
+    (apply (curry *top-map*) top-bindings))
 
 (when *initializing*
-<<<<<<< Updated upstream
-  (progn
-    (sb-ext:run-program "sh" '("~/.fehbg"))
-    (sb-ext:run-program "keynav" '())
-    (mode-line)))
-
-(unless (mode-line)
-  (mode-line))
-(load-module "stumptray")
-(stumptray::stumptray)
-=======
   (run-shell-command "xmobar"))
->>>>>>> Stashed changes

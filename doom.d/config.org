@@ -1,20 +1,14 @@
 #+TITLE: Doom Emacs configuration
 #+AUTHOR: Cloud Strife (Spektrum_light, gear-piped, purity-interface, topological android GAR-XB/G-3778 id: MGlIGTfxzZ formula-spectre)
-
-
+#+PROPERTY: header-args :shebang ";;; $DOOMDIR/config.el -*- lexical-binding: t; -*-\n"
+#+auto_tangle: t
 this is my emacs configuration. it's not pretty. it's not functional. But it works for me. Deal with it
 jokes aside, still working on improving both the org structure and the code itself. please do tell me that my elisp sucks, I need some CC
 any help is appreciated :)
 
- use lexical bindings
- #+BEGIN_SRC emacs-lisp
- ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
- #+END_SRC
-*configure xmobar
 this section has been stolen from the xmobar etc codeberg repo directory, all credits to jaor:
 
-* Main emacs configuration
-** theme emacs bit
+* theme emacs bit
 *** font
  #+BEGIN_SRC emacs-lisp
 (setq doom-font (font-spec :family "Iosevka Nerd Font" :size 14)
@@ -38,11 +32,7 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
 #+END_SRC
 *** General appearence
 #+BEGIN_SRC emacs-lisp
-<<<<<<< Updated upstream
-(setq doom-theme 'cyberpunk     )
-=======
 (setq doom-theme 'cyberpunk)
->>>>>>> Stashed changes
 (setq doom-line-numbers-style 'relative)
 (setq display-line-numbers-type 'relative)
  (setq org-directory "~/org/")
@@ -61,7 +51,7 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
     this file. Emacs searches the `load-path' when you load packages with
     `require' or `use-package'.
   - `map!' for binding new keys
-** mu4e configuration
+* mu4e configuration
  #+BEGIN_SRC emacs-lisp
  (when (file-directory-p "/usr/share/emacs/site-lisp/mu4e" )
    (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e"))
@@ -92,35 +82,37 @@ this section has been stolen from the xmobar etc codeberg repo directory, all cr
           ("/[Gmail]/Drafts"    . ?d)
          ("/[Gmail]/All Mail"  . ?a))))
  #+END_SRC
-** circe configuration
+* circe configuration
 #+BEGIN_SRC emacs-lisp
 ;TODO: encrypt the password
 (require 'circe)
 (setq circe-reduce-lurker-spam t)
 (circe-set-display-handler "JOIN" (lambda (&rest ignored) nil))
 #+END_SRC
-** org-auto-tangle configuration
+* org-auto-tangle configuration
 #+BEGIN_SRC emacs-lisp
 (use-package org-auto-tangle
   :load-path "site-lisp/org-auto-tangle/"    ;; this line is necessary only if you cloned the repo in your site-lisp directory
   :defer t
   :hook (org-mode . org-auto-tangle-mode))
 #+END_SRC
-** misc stuff
-<<<<<<< Updated upstream
-=======
+* misc stuff
 #+BEGIN_SRC emacs-lisp
  (setq org-directory "~/org/")
  (load! (concat (getenv "DOOMDIR") "/private"))
 
+;(advice-add
+; 'vterm :filter-args
+; (lambda (args)
+;   (when current-prefix-arg
+;     (list (read-from-minibuffer "Vterm Name: ")))))
 #+END_SRC
->>>>>>> Stashed changes
 *** frog-jumper configuration
 #+BEGIN_SRC emacs-lisp
 (use-package frog-jump-buffer :ensure t)
 (unbind-key (kbd "C-x C-b"))
 (global-set-key (kbd "C-x C-b") #'frog-jump-buffer)
-(global-set-key (kbd "C-x B") #'ibuffer)
+(global-set-key (kbd "C-x b") #'ibuffer)
 (setq frog-jump-buffer-use-all-the-icons-ivy t)
 (dolist (regexp '("^\\*Native-compile-log" "^\\*Async-native-compile-log" "^\\*Messages"))
   (push regexp frog-jump-buffer-ignore-buffers))
@@ -147,9 +139,19 @@ this is for stumpwm, it's hacky at best
 
 *** gentoo specific stuff
 #+BEGIN_SRC emacs-lisp
-    (when (string= (doom-system-distro) "gentoo")
-(require 'portage)
-(require 'magentoo))
+(when (string= (doom-system-distro) "gentoo")
+  (require 'portage)
+  (setq portage-full-upgrade-shmu-options '(:ask
+                                           :verbose
+                                           :update
+                                           :newuse
+                                           :deep
+                                           :complete-graph y
+                                           :with-bdeps y
+                                           :backtrack 50
+                                           :keep-going y
+                                           ))
+  (require 'magentoo))
 #+END_SRC
 
 *** TRAMP configuration
@@ -255,23 +257,32 @@ _SPC_ cancel	  	_d_elete
                     (:desc "new buffer"            "n" #'+default/new-buffer)
                     (:desc "kill this buffer"      "k" #'kill-this-buffer))
        
- ;;       (:prefix-map ("t" . "toggle")
- ;;                    (:prefix-map ("t" . "telega")
- ;;                                 (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
- ;;                                 ;(:desc "start telega"       "t" #'telega)
- ;;                                 (:desc "telega chat with"   "c" #'telega-chat-with)
- ;;                                 (:desc "kill telega"        "q" #'telega-kill)))
- ;;       (:prefix-map ("M-p" . "portage")
- ;;                    ))
+        (:prefix-map ("t" . "toggle")
+                     (:prefix-map ("t" . "telega")
+                                  (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
+                                  ;(:desc "start telega"       "t" #'telega)
+                                  (:desc "telega chat with"   "c" #'telega-chat-with)
+                                  (:desc "kill telega"        "q" #'telega-kill)))
+ 
 )
 #+END_SRC
+
+#+RESULTS:
+: telega-kill
 
 **** global keys
  #+BEGIN_SRC emacs-lisp
  (global-set-key (kbd "C-\\") #'undo)
+ (global-set-key (kbd "M-:") #'eval-expression)
+
+(add-hook 'vterm-mode-hook
+          (lambda ()
+            (local-set-key (kbd "M-:") 'eval-expression)))
  #+END_SRC
-** EXWM configuration
- #+BEGIN_SRC emacs-lisp
+
+* EXWM configuration
+*** exwmsw configuaration
+
  ;map where the workspaces shall be
  (setq exwmsw-active-workspace-plist
        '("HDMI-1" 0 "HDMI-2" 0
@@ -284,17 +295,14 @@ _SPC_ cancel	  	_d_elete
          "LVDS-1" 7 "HDMI-2" 7))
  (setq exwmsw-the-right-screen "LVDS1")
  (setq exwmsw-the-center-screen "HDMI-2")
- (require 'exwm-systemtray)
- (exwm-systemtray-enable)
- #+END_SRC
+
 
 *** define some helper functions
  efs stands for emacs from scratch since I +stole+ /borrowed/ this part from system crafters.
  but here they stand for exwm function sex
- #+BEGIN_SRC emacs-lisp
+
 (defun efs/exwm-init-hook ()
   ;; Make workspace 1 be the one where we land at startup
-<<<<<<< Updated upstream
   (exwm-workspace-switch-create 1))
 
 (defun efs/exwm-update-class ()
@@ -313,19 +321,16 @@ _SPC_ cancel	  	_d_elete
 
     (exwm-floating-move (- pos-x) (- pos-y))))
 
-=======
   (exwm-workspace-switch-create 1)
   (xmobar-mode))
- #+END_SRC
+
 *** main exwm configuration
-#+BEGIN_SRC emacs-lisp
->>>>>>> Stashed changes
+
  (use-package exwm
    :config
    ;; Set the default number of workspaces
-   (setq exwm-workspace-number 9)
+;;   (setq exwm-workspace-number 9)
 
-<<<<<<< Updated upstream
    ;; When window "class" updates, use it to set the buffer name
    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
 
@@ -335,15 +340,13 @@ _SPC_ cancel	  	_d_elete
    ;; Configure windows as they're created
    ;(add-hook 'exwm-manage-finish-hook #'efs/configure-window-by-class)
 
-=======
->>>>>>> Stashed changes
    ;; When EXWM starts up, do some extra confifuration
    (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
 
    ;; NOTE: Uncomment the following two options if you want window buffers
    ;;       to be available on all workspaces!
 
-<<<<<<< Updated upstream
+
    ;; Automatically move EXWM buffer to current workspace when selected
    (setq exwm-layout-show-all-buffers t)
 
@@ -353,12 +356,10 @@ _SPC_ cancel	  	_d_elete
    ;; NOTE: Uncomment this option if you want to detach the minibuffer!
    ;; Detach the minibuffer (show it with exwm-workspace-toggle-minibuffer)
    ;;(setq exwm-workspace-minibuffer-position 'top)
-=======
-
    (setq exwm-layout-show-all-buffers t ; Automatically move EXWM buffer to current workspace when selected
          exwm-workspace-show-all-buffers t ; Display all EXWM buffers in every workspace buffer list
     )
->>>>>>> Stashed changes
+
 
    ;; Set the screen resolution (update this to be the correct resolution for your screen!)
    (require 'exwm-randr)
@@ -417,14 +418,14 @@ _SPC_ cancel	  	_d_elete
                            (exwm-workspace-switch-create ,i))))
                      (number-sequence 0 9))))
 
-<<<<<<< Updated upstream
-=======
+
+
      (exwm-input-set-key (kbd "s-SPC")  #'eshell)
      (exwm-input-set-key (kbd "s-<return>") (lambda ()
                                          (interactive)
                                          (+vterm/here "~/")))
 
->>>>>>> Stashed changes
+
      (cl-macrolet ((bwrapper (file &optional (title file))
                         `(lambda () (interactive)
                            (start-process-shell-command
@@ -432,38 +433,20 @@ _SPC_ cancel	  	_d_elete
                    (start (name)
                           `(lambda () (interactive)
                              (start-process ,name nil ,name))))
-<<<<<<< Updated upstream
                           (map! :leader
                          (:prefix-map ("x" . "X11 applications")
                                       (:desc "brave wrapped"         "b" (bwrapper "brave"))
                                       (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
                                       (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
-                                      (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
+                                     (:desc "telegram wrapped"       "t" (bwrapper "telegram-desktop"))
                                       (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
                                       (:desc "librewolf unwrapped"   "l" (start "librewolf"))
                                       ))
                    )
-)
+);; (use-package) exwm ends here
 
- #+END_SRC
-=======
-       (map! :leader
-             (:prefix-map ("x" . "X11 applications")
-                          (:desc "brave wrapped"         "b" (bwrapper "brave"))
-                          (:desc "deltachat wrapped"     "d" (bwrapper "deltachat-desktop" "deltachat"))
-                          (:desc "whatsdesk wrapped"     "w" (bwrapper "whatsdesk"))
-                          (:desc "telegram wrapped"      "t" (bwrapper "telegram-desktop"))
-                          (:desc "lycheeslicer wrapped"  "M-l" (bwrapper "lycheeslicer"))
-                          (:desc "librewolf unwrapped"   "l" (start "librewolf"))
-                          ))
-                   )
-) ; (use-package) exwm ends here
- #+END_SRC
-***
->>>>>>> Stashed changes
-** telega configuration
+* telega configuration
  this some configuration for telega
-
  #+BEGIN_SRC emacs-lisp
  (setq telega-server-libs-prefix "/usr")
  (add-hook 'telega-load-hook 'telega-notifications-mode)
@@ -476,4 +459,5 @@ _SPC_ cancel	  	_d_elete
  (setq telega-emoji-font-family "Iosevka Nerd Font")
  (setq telega-emoji-use-images t)
  (add-hook 'telega-chat-mode-hook 'toggle-truncate-lines)
+ (add-hook 'telega-load-hook 'telega-mode-line-mode)
 #+END_SRC
