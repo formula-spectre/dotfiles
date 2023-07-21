@@ -8,27 +8,22 @@
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
-(package! ednc)
+(package! prism)
 (package! vterm)
 (package! ement)
-(package! org-caldav)
-(package! telega)
 (package! pdf-tools)
 (package! w3m)
-;(package! neotree)
-;(package! exwm)
 (package! dot-mode)
-;(package! mu4e)
 (package! cyberpunk-theme)
-;(package! wand)
 (package! hydra)
 (package! avy)
-;(package! feebleline)
-;(package! autothemer)
 (package! frog-jump-buffer)
-;(package! polymode)
-;(package! poly-org)
+(package! all-the-icons-ivy)
+(package! visual-regexp-steroids)
 (package! org-auto-tangle)
+(package! tron-legacy-theme)
+(package! crux)
+(package! org-bullets)
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
@@ -44,9 +39,7 @@
 (package! keychain-enironment
   :recipe (:host github :repo "tarsius/keychain-environment"
                  :files ("keychain-environment.el")))
-(package! pomodoro.el
-  :recipe (:host github :repo "baudtack/pomodoro.el"
-                 :files ("pomodoro.el")))
+
 (package! gitconfig-mode
   :recipe (:host github :repo "magit/git-modes"
            :files ("gitconfig-mode.el")))
@@ -59,13 +52,9 @@
   :recipe (:host github
            :repo "kmonad/kbd-mode"))
 
-;(package! almost-mono-theme
-;   :recipe (:host github :repo "cryon/almost-mono-themes"))
-(package! monochrome
-  :recipe (:host github :repo "fxn/monochrome-theme.el"))
-
 (package! sxhkd-mode
   :recipe (:host github :repo "xFA25E/sxhkd-mode"))
+
 ;; If you'd like to disable a package included with Doom, you can do so here
 ;; with the `:disable' property:
 ;(package! builtin-package :disable t)

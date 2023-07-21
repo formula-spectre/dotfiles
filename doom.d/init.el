@@ -1,4 +1,4 @@
-;; init.el -*- lexical-binding: t; -*-
+; init.el -*- lexical-binding: t; -*-
 
 ;; This file controls what Doom modules are enabled and what order they load
  ;; in. Remember to run 'doom sync' after modifying it!
@@ -48,7 +48,7 @@
        vc-gutter         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        window-select     ; visually switch windows
-       workspaces        ; tab emulation, persistence & separate workspaces
+       ;;workspaces        ; tab emulation, persistence & separate workspaces
        zen               ; distraction-free coding or writing
 
        :editor
@@ -57,7 +57,7 @@
        fold              ; (nigh) universal code folding
        ;;(format +onsave)  ; automated prettiness
        ;; god               ; run Emacs commands without modifier keys
-       ;;lispy             ; vim for lisp, for people who don't like vim
+       lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
        ;;parinfer          ; turn lisp into python, sort of
