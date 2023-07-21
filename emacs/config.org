@@ -40,6 +40,15 @@ The packages that are defined here are basically just meant to be installed prog
   (leaf god-mode :straight t)
   (leaf zen-mode :straight t)
   (leaf writeroom-mode :straight t)
+  (leaf prism :straight t)
+
+  ;; first prototype of a function that defines the os
+  (unless (executable-find "emerge")
+    (progn
+      (leaf telega    :straight t)
+      (leaf pdf-tools :straight t)
+      (leaf sly       :straight t)
+      (leaf )))
   #+end_src
 
 * customize the look
