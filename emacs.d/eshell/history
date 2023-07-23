@@ -1,0 +1,27 @@
+rm -rvf ~/.telega/
+exit
+ls
+rm objtool.patch 
+cat hash.txt 
+rm hash.txt 
+cat wip.elisp 
+rm wip.elisp 
+cd .config/doom
+ls
+rg -i all-the-icons
+cd
+grep telega .config/doom.d/config.el 
+cd ../doom
+rg vterm/here .
+find-file modules/term/vterm/autoload.el 
+cd .config/emacs
+ls
+cd ../emacs.d/
+ls
+cat config.org 
+cat config.el
+ls
+cd
+ls
+ls -a
+exit
