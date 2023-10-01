@@ -1,0 +1,61 @@
+{
+    // "layer": "top", // Waybar at top layer
+    // "position": "bottom", // Waybar position (top|bottom|left|right)
+    "height": 24, // Waybar height (to be removed for auto height)
+    // "width": 1280, // Waybar width
+    "spacing": 0, // Gaps between modules (4px)
+
+    // Choose the order of the modules
+    "modules-left": ["sway/workspaces", "sway/mode"],
+    "modules-center": ["clock"],
+    "modules-right": ["wireplumber", "battery", "temperature", "cpu", "memory", "tray"],
+
+    "wireplumber": {
+        "format": "[VOL:{volume}%]",
+        "format-muted": "[MUTED]",
+        "on-click-right": "pavucontrol",
+        "on-click": "amixer set Master toggle",
+        "max-volume": 150,
+        "scroll-step": 0.5
+    },
+    "tray": {
+        "icon-size": 21,
+        "spacing": 10
+    },
+    "clock": {
+        // "timezone": "America/New_York",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "interval": 1,
+        "format"  : "{:%b %a %d (%H:%M:%S)}"
+    },
+    "cpu": {
+        "format": "[CPU:{usage}%]",
+        "tooltip": false
+    },
+    "memory": {
+        "format": "[RAM:{}%]"
+    },
+    "temperature": {
+        // "thermal-zone": 2,
+        // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
+        "critical-threshold": 80,
+        // "format-critical": "{temperatureC}°C {icon}",
+        "format": "[TEMP:{temperatureC}°C]",
+    },
+    "battery": {
+        "states": {
+            "good": 95,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "[({time}) {capacity}% {icon}]",
+        "format-charging": "[({time}) {capacity}% +]",
+        "format-plugged": "[({time}) {capacity}% !]",
+        "format-alt": "[({time}) {icon}]",
+        "format-icons" : ["I", "II", "III", "IV", "V"]
+    },
+
+
+    }
+}
+
