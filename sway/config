@@ -20,7 +20,7 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term alacritty
+set $term tym
 
 set $menu bemenu-run -c -l 6 -M 250 | xargs swaymsg exec --
 
@@ -51,6 +51,7 @@ gaps outer 4
 # resumed. It will also lock your screen before your computer goes to sleep.
 exec autotiling -w 1 2 3 4 5 6 7 8 9
 exec  mkdir -p /tmp/${USER}/service
+ln -sfT /tmp/formula/s6-rc* /tmp/formula/s6-rc
 exec s6-rc-init -c ${HOME}/.config/s6u/rc/compiled -l /tmp/formula/s6-rc /tmp/formula/service &
 exec s6-rc -l /tmp/formula/s6-rc -u change default wayland-bundle
 
@@ -68,7 +69,7 @@ exec s6-rc -l /tmp/formula/s6-rc -u change default wayland-bundle
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 input  "type:keyboard" {
-       xkb_options caps:ctrl_modifier
+      xkb_options caps:ctrl_modifier
 }
 ### Key bindings
 #
@@ -103,7 +104,7 @@ input  "type:keyboard" {
 # Moving around:
 #
     # Move your focus around
-    #bindsym $mod+$left focus left
+    bindsym $mod+$left focus left
     bindsym $mod+$down focus down
     bindsym $mod+$up focus up
     bindsym $mod+$right focus right
@@ -127,16 +128,16 @@ input  "type:keyboard" {
 # Workspaces:
 #
     # Switch to workspace
-    bindsym alt+1 workspace number 1
-    bindsym alt+2 workspace number 2
-    bindsym alt+3 workspace number 3
-    bindsym alt+4 workspace number 4
-    bindsym alt+5 workspace number 5
-    bindsym alt+6 workspace number 6
-    bindsym alt+7 workspace number 7
-    bindsym alt+8 workspace number 8
-    bindsym alt+9 workspace number 9
-    bindsym alt+0 workspace number 10
+    bindsym $mod+1 workspace number 1
+    bindsym $mod+2 workspace number 2
+    bindsym $mod+3 workspace number 3
+    bindsym $mod+4 workspace number 4
+    bindsym $mod+5 workspace number 5
+    bindsym $mod+6 workspace number 6
+    bindsym $mod+7 workspace number 7
+    bindsym $mod+8 workspace number 8
+    bindsym $mod+9 workspace number 9
+    bindsym $mod+0 workspace number 10
     # Move focused container to workspace
     bindsym $mod+Shift+1 move container to workspace number 1
     bindsym $mod+Shift+2 move container to workspace number 2
@@ -156,8 +157,7 @@ input  "type:keyboard" {
     # You can "split" the current object of your focus with
     # $mod+b or $mod+v, for horizontal and vertical splits
     # respectively.
-    bindsym $mod+3 splith
-    bindsym $mod+2 splitv
+
 
     # Switch the current container between different layout styles
     #bindsym $mod+s layout stacking
@@ -219,9 +219,11 @@ mode "applications" {
     bindsym f exec firefox; mode default
     bindsym b exec $container brave; mode default
     bindsym alt+l exec $container lycheeslicer; mode default
-    bindsym o exec $container obsidian
+    bindsym o exec $container obsidian; mode default
+    bindsym d exec $container discord; mode default
 
-
+    bindsym $mod+3 splith
+    bindsym $mod+2 splitv
     # Return to default mode
     bindsym Return mode "default"
     bindsym Escape mode "default"
