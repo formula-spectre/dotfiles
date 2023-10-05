@@ -39,14 +39,7 @@ The packages that are defined here are basically just meant to be installed prog
   (leaf general :straight t)
   (leaf god-mode :straight t)
   (leaf zen-mode :straight t)
-  (leaf writeroom-mode :straight t)
-
-  ;; first prototype of a function that defines the os
-  (unless (executable-find "emerge")
-    (progn
-      (leaf telega    :straight t)
-      (leaf pdf-tools :straight t)
-      (leaf sly       :straight t)))
+;  (leaf writeroom-mode :straight t)
   #+end_src
 
 * customize the look
@@ -249,25 +242,20 @@ I defined every package with ~:straight t~ so I can always be sure that they're 
 #+begin_src emacs-lisp
   (leaf helm
     :straight t
-    :config (helm-mode 1)
-    :bind
-    ("M-x" . helm-M-x)
-    ([remap find-file] . helm-find-files)
-    )
-#+end_src
-** all-the-icons
-#+begin_src emacs-lisp
-  (leaf all-the-icons
-    :straight t
-    :commands (all-the-icons-octicon
-               all-the-icons-faicon
-               all-the-icons-fileicon
-               all-the-icons-wicon
-               all-the-icons-material
-               all-the-icons-alltheicon)
-    :preface
-    (add-hook 'after-setting-font-hook
-               (defun init-all-the-icons-fonts-h ()
+    :config (leaf telega
+  :setq
+  (telega-server-libs-prefix . "/usr")
+  (telega-appindicator-use-labels . t)
+  (telega-chat-input-markups . '("org" "markdown2"))
+  (telega-directory . '(concat (getenv "XDG_DATA_HOME") "/telega"))
+  (telega-emoji-font-family . "Iosevka Nerd Font")
+  (telega-emoji-use-images . t)
+  :hook
+  ((telega-load-hook  .telega-notifications-mode)
+   (telega-load-hook . telega-appindicator-mode)
+   (telega-chat-mode-hook . toggle-truncate-lines)
+   (telega-load-hook . telega-mode-line-mode)))
+()
                  (when (fboundp 'set-fontset-font)
                    (dolist (font (list "Weather Icons"
                                        "github-octicons"
@@ -404,24 +392,24 @@ I defined every package with ~:straight t~ so I can always be sure that they're 
 #+end_src
 ** telega
 #+begin_src emacs-lisp
- (setq telega-server-libs-prefix "/usr")
- (add-hook 'telega-load-hook 'telega-notifications-mode)
- (add-hook 'telega-load-hook 'telega-appindicator-mode)
- (setq telega-appindicator-use-labels t)
-
- (setq telega-chat-input-markups '("org" "markdown2"))
- (setq telega-directory (concat (getenv "XDG_DATA_HOME") "/telega"))
- (setq telega-emoji-font-family "Iosevka Nerd Font")
- (setq telega-emoji-use-images t)
- (add-hook 'telega-chat-mode-hook 'toggle-truncate-lines)
- (add-hook 'telega-load-hook 'telega-mode-line-mode)
+  (leaf telega
+    :hook ((telega-load-hook . telega-notification-mode)
+           (telega-load-hook . telega-appindicator-mode)
+           (telega-load-hook . telega-mode-line-mode)
+           (telega-chat-mode-hook . toggle-truncate-lines))
+    :config
+    (setq telega-server-libs-prefix "/usr"
+          telega-appindicator-use-labels t
+          telega-chat-input-markups '("org" "markdown2")
+          telega-directory (concat (getenv "XDG_DATA_HOME") "/telega")
+          telega-emoji-font-family "Iosevka Nerd Font"
+          telega-emoji-use-images t))
 #+end_src
 ** prism
 #+begin_src emacs-lisp
   (leaf prism
     :straight t
     :hook ((prog-mode-hook . prism-mode)))
-
 #+end_src
 * the todo laundry list
 - add a hook to vterm to disable line numbers

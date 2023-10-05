@@ -12,6 +12,7 @@ in
         "/home/${USER}/.config/emacs/bin"
         "/home/${USER}/.nix-profile/bin/"
         "/home/${USER}/.local/bin"
+        "/home/${USER}/.local/bin/bw/"
      ];
      sessionVariables = {
        NIX_PATH="/home/${USER}/.nix-defexpr/channels";
@@ -34,12 +35,62 @@ in
        LESSHISTFILE="${config.xdg.cacheHome}/less/history";
        ICEAUTHORITY="${config.xdg.cacheHome}/ICEauthority";
        XCOMPOSECACHE="${config.xdg.cacheHome}/X11/compose";
-       XKB_DEFAULT_OPTIONS="ctrl:nocaps";
-       XKB_DEFAULT_LAYOUT="it(us)";
+       #XKB_DEFAULT_OPTIONS="ctrl:nocaps";
+       #XKB_DEFAULT_LAYOUT="\"it(us)\"";
        PASSWORD_STORE_GPG_OPTS="--default-recipient cloud.strife@tuta.io";
+       MOZ_ENABLE_WAYLAND=1;
      };
    };
    programs = {
+     nushell = {
+       enable = true;
+       extraConfig = "
+$env.config.completions.algorithm =  \"fuzzy\"
+$env.config.show_banner = false
+       ";
+
+       shellAliases = {
+         cp="~/.local/bin/ucp -rvg";
+         jobs="jobs -p";
+         #ls="lsd -F --color=never";
+         grep="rg";
+         #md="mkdir -p";
+         e="emacsclient -ct";
+         s6-rc-user="s6-rc -l /tmp/\$\{USER\}/s6-rc";
+         cat="bat";
+         yt-mp3="youtube-dl -x --audio-format mp3 --prefer-ffmpeg";
+         #yt-mp4="";
+         k="kubectl";
+         gc="git clone";
+       };
+       environmentVariables =  {
+         NIX_PATH="/home/${USER}/.nix-defexpr/channels";
+         TERM="xterm";
+         BROWSER="${BROWSER}";
+         XDG_CONFIG_HOME="/home/${USER}/.config";
+         ZSH_COMPDUMP = "${config.xdg.cacheHome}/zsh/zcompdump";
+         EMACSDIR = "${config.xdg.configHome}/emacs";
+         DOOMDIR = "${config.xdg.configHome}/doom.d";
+         ZSHZ_DATA = "${config.xdg.dataHome}/zsh/zshzdb";
+         XMONAD_CONFIG_HOME="${config.xdg.configHome}/xmonad";
+         XMONAD_DATA_DIR="${config.xdg.configHome}/xmonad";
+         XMONAD_CACHE_DIR="${config.xdg.configHome}/xmonad";
+         CABAL_CONFIG="${config.xdg.configHome}/cabal/config";
+         CABAL_DIR="${config.xdg.configHome}/cabal";
+         CARGO_HOME="${config.xdg.dataHome}/cargo";
+         GHCUP_USE_XDG_DIRS="true";
+         GNUPGHOME="${config.xdg.dataHome}/gnupg";
+         GTK2_RC_FILES="${config.xdg.configHome}/gtk-2.0/gtkrc";
+         LESSHISTFILE="${config.xdg.cacheHome}/less/history";
+         ICEAUTHORITY="${config.xdg.cacheHome}/ICEauthority";
+         XCOMPOSECACHE="${config.xdg.cacheHome}/X11/compose";
+         #XKB_DEFAULT_OPTIONS="ctrl:nocaps";
+         #XKB_DEFAULT_LAYOUT="it(us)";
+         PASSWORD_STORE_GPG_OPTS="\"--default-recipient cloud.strife@tuta.io\"";
+         MOZ_ENABLE_WAYLAND="1";
+       };
+
+     };
      direnv = {
        enable = true;
        nix-direnv.enable = true;
@@ -51,6 +102,7 @@ in
      starship = {
        enable = true;
        enableZshIntegration = true;
+       enableNushellIntegration = true;
        settings = {
        character = {
          success_symbol = "[\\(\\(ﬦ\\).\\(>>=\\)\\)](bold white)";
@@ -69,7 +121,7 @@ in
            extensions = with pkgs.nur.repos.rycee.firefox-addons;
              [
                #add-custom-search-engine
-               anonaddy
+               addy_io
                browserpass
                canvasblocker
                clearurls
@@ -100,6 +152,13 @@ in
        };#firefox ends here
      lsd.enable = true;
      bat.enable = true;
+
+     # nushell = {
+     #   enable = true;
+     #   shellAliases = {
+     #      cp = "ucp -rgv";
+     #   };
+     # };
      zsh = {
        completionInit = "autoload -U compinit && compinit -u";
        envExtra = ''
@@ -107,7 +166,7 @@ source /etc/profile
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
-export PATH=$PATH:~/.nix-profile/bin:~/.local/bin #FIXME!
+export PATH=$PATH:~/.nix-profile/bin:~/.local/bin:~/.local/bin/bw #FIXME!
                   '';
        profileExtra = ''
 if [  "$(tty)" = "/dev/tty1" ] ; then
@@ -139,14 +198,14 @@ fi
        enable = true;
        enableAutosuggestions = true;
        enableCompletion = true;
-       enableSyntaxHighlighting = true;
+       syntaxHighlighting.enable = true;
        autocd = true;
        shellGlobalAliases = {
          termbin="nc termbin.com 9999";
          r="rm -rvf";
        };
        shellAliases = {
-         cp="cp -rv";
+         cp="ucp -rvg";
          jobs="jobs -p";
          ls="lsd -F --color=never";
          grep="rg";
