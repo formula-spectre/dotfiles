@@ -15,7 +15,7 @@ set $term tym
 
 #autostart
 #set $menu bemenu-run -c -l 6 -M 250 | xargs swaymsg exec --
-set $menu rofi -show drun | xargs swaymsg exec --
+set $menu wofi --show drun | xargs swaymsg exec --
 gaps inner 4
 gaps outer 4
 exec swayidle -w \
@@ -39,9 +39,7 @@ input  "type:keyboard" {
       xkb_variant us
 }
 
-output "*"  {
-       bg "/home/formula/documents/Pictures/walls/wp6978617-warhammer-necrons-wallpapers.png" fill "#000000"
-}
+output "*" background /home/formula/documents/Pictures/walls/admech-wallpaper.png fill "#000000"
 
 ### Key bindings
 #
@@ -62,7 +60,7 @@ output "*"  {
     # Start your launcher
     bindsym $mod+p exec $menu
 
-    bindsym XF86RotateWindows exec wlr-randr --output LVDS-1 --pos 3286,0 --transform 180
+    bindsym XF86TaskPane exec wlr-randr --output LVDS-1 --pos 3286,0 --transform 180
     # start emacsclient
     bindsym $mod+x mode "applications"
     # Drag floating windows by holding down $mod and left mouse button.
@@ -86,7 +84,6 @@ output "*"  {
     bindsym $mod+$up focus up
     bindsym $mod+$right focus right
     # Or use $mod+[up|down|left|right]
-    bindsym $mod+Left exec wlr-randr --output eDP-1 --mode 1366x768 --pos 1351,168 --scale 1.00 --on; 
     bindsym $mod+Down focus down
     bindsym $mod+Up focus up
     bindsym $mod+Right focus right
@@ -198,20 +195,20 @@ mode "applications" {
     bindsym alt+l exec $container lycheeslicer; mode default
     bindsym o exec $container obsidian; mode default
     bindsym d exec $container discord; mode default
-
+    bindsym c exec $container calibre; mode default
+    bindsym t exec $container torbrowser-launcher; mode default
+    bindsym p exec sh "distrobox enter arch -- $(wofi --dmenu)"
     bindsym $mod+3 splith; mode default
     bindsym $mod+2 splitv; mode default
     # Return to default mode
     bindsym Return mode "default"
     bindsym Escape mode "default"
+
 }
 bar {
      position top
      swaybar_command waybar
   }
-for_window [title = "About Mozilla Firefox"] floating enable
-for_window [window_role = "About"] floating enable
-for_window [app_id="firefox" title="Library"] floating enable, border pixel 1, sticky enabl
 for_window [window_role = "pop-up"] floating enable
 for_window [window_role = "bubble"] floating enable
 for_window [window_role = "dialog"] floating enable
