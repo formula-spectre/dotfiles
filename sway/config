@@ -60,7 +60,11 @@ output "*" background /home/formula/documents/Pictures/walls/admech-wallpaper.pn
     # Start your launcher
     bindsym $mod+p exec $menu
 
-    bindsym XF86TaskPane exec wlr-randr --output LVDS-1 --pos 3286,0 --transform 180
+    bindsym --locked XF86TaskPane exec wlr-randr --output LVDS-1 --pos 3286,0 --transform 180
+    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 10%+
+    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 10%-
+    bindsym --locked $mod+XF86MonBrightnessDown exec  brightnessctl set 100%-
+    bindsym --locked $mod+XF86MonBrightnessUp exec  brightnessctl set 100%+
     # start emacsclient
     bindsym $mod+x mode "applications"
     # Drag floating windows by holding down $mod and left mouse button.
@@ -197,6 +201,8 @@ mode "applications" {
     bindsym d exec $container discord; mode default
     bindsym c exec $container calibre; mode default
     bindsym t exec $container torbrowser-launcher; mode default
+    bindsym w exec $container whatsdesk; mode default
+    bindsym m exec dbus-launch $container mercury-browser; mode default
     bindsym p exec sh "distrobox enter arch -- $(wofi --dmenu)"
     bindsym $mod+3 splith; mode default
     bindsym $mod+2 splitv; mode default
