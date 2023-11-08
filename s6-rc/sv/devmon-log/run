@@ -1,3 +1,3 @@
 #!/bin/execlineb -P
 importas USER USER
-fdmove -c 2 1 /home/${USER}/.config/s6u/user-logger devmon
+fdmove -c 2 1 /home/${USER}/.config/s6-rc/user-logger devmon
