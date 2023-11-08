@@ -46,36 +46,7 @@
 (set-module-dir "/usr/share/common-lisp/source/stumpwm-contrib/")
 (defvar *foreground* "#FFFFFF")
 #+END_SRC
-** define the font
-#+BEGIN_SRC lisp
-;(ql:quickload :clx-truetype)
-;(load-module "ttf-fonts")
-;(setq clx-truetype::*font-dirs*
-;    (append (list (namestring (merge-pathnames ".local/share/fonts" (user-homedir-pathname))))
-    ;             clx-truetype::*font-dirs*))
-;(xft:cache-fonts)
-;(set-font (make-instance 'xft:font
-;                          :family "Iosevka Nerd Font"
-;                          :subfamily "Regular"
-;                          :size 8
-;                          :antialias t))
-#+END_SRC
 ** macros!
-*** define a macro to make generate emacs commands
-#+BEGIN_SRC lisp
-(defmacro emacs-cmd (name emacs-command)
-  "a macro that permits to easily define emacs commands"
-    `(defcommand ,name () ()
-       (emacs)
-       (meta (kbd "M-x"))
-       (window-send-string ,emacs-command)
-       (meta (kbd "RET"))))
-#+END_SRC
-**** emacs commands
-#+BEGIN_SRC lisp
-(emacs-cmd emacs-magit    "magit")
-(emacs-cmd emacs-calendar "=calendar")
-#+END_SRC
 *** define a macro to make mapping to various maps (heh) easier
 #+BEGIN_SRC lisp
 (defmacro mmap (map key command)
@@ -97,27 +68,7 @@
 (setf *mouse-focus-policy* :sloppy)
 #+END_SRC
 
-*** define a custom keymap for my most used applications
-#+BEGIN_SRC lisp
-(defvar *my-application-keymap*
-  (let ((m (make-sparse-keymap)))
-    (mmap m "b" "exec ~/.local/bin/bw/brave")
-    (mmap m "M-d" "exec ~/.local/bin/bw/deltachat")
-    (mmap m "d" "exec ~/.local/bin/bw/abaddon")
-    (mmap m "D" "exec ~/.local/bin/bw/discord")
-    ;(mmap m "l" "exec librewolf")
-    (mmap m "l" "exec ~/.local/bin/bw/librewolf")
-    (mmap m "M-l" "exec ~/.local/bin/bw/lycheeslicer")
-    (mmap m "s" "exec flatpak run com.valvesoftware.Steam ")
-    (mmap m "S" "exec ~/.local/bin/bw/steam")
-    (mmap m "t" "exec emacsclient -e '(telega t)'")
-    (mmap m "T" "exec emacsclient -e '(telega-kill t)'")
-    (mmap m "w" "exec ~/.local/bin/bw/whatsdesk")
-    ;(mmap m "a" "exec flatpak run com.belmoussaoui.Authenticator")
-    m))
-#+END_SRC
-*** define a custom keymap for emacs commands
-#+BEGIN_SRC lisp
+#+begin_src lisp
 (defvar *emacs-application-keymap*
   (let ((m (make-sparse-keymap)))
     (dolist
@@ -126,8 +77,27 @@
                      (,(kbd "c") "emacs-calendar")
                      (,(kbd "C-s") "emacs-auto-slynk")))
       (apply (curry m) emacs-map))))
+
+#+end_src
+*** define a custom keymap for my most used applications
+#+begin_src  lisp
+(defvar *my-application-keymap*
+  (let ((m (make-sparse-keymap)))
+    (mmap m "b" "exec ~/.local/bin/bw/brave")
+    (mmap m "M-d" "exec ~/.local/bin/bw/deltachat")
+    (mmap m "d" "exec ~/.local/bin/bw/abaddon")
+    (mmap m "D" "exec ~/.local/bin/bw/discord")
+    (mmap m "f" "exec firefox")
+    (mmap m "M-l" "exec ~/.local/bin/bw/lycheeslicer")
+    (mmap m "s" "exec flatpak run com.valvesoftware.Steam ")
+    (mmap m "S" "exec ~/.local/bin/bw/steam")
+    (mmap m "t" "exec emacsclient -e '(telega t)'")
+    (mmap m "T" "exec emacsclient -e '(telega-kill t)'")
+    (mmap m "w" "exec ~/.local/bin/bw/whatsdesk")
+    (mmap m "l" "exec ~/.local/bin/bw/librewolf")
+    (mmap m "o" "exec ~/.local/bin/bw/obsidian")
+    m))
 #+END_SRC
-*** set the prefix to mod-x, to emulate emacs.
 #+BEGIN_SRC lisp
 (set-prefix-key (kbd "s-x"))
 #+END_SRC
@@ -137,9 +107,18 @@
   (which-key-mode))
 #+END_SRC
 *** undefine default bindings
-#+BEGIN_SRC lisp
-(undefine-key *root-map* (kbd "x"))
+#+begin_src  lisp
+(undefine-key *root-map* (kbd "o"))
+(dolist
+    (default-bindings `(
+                        (,(kbd "M-n")) (,(kbd "M-p")) (,(kbd "x"))
+                        (,(kbd "a"))   (,(kbd "C-a")) (,(kbd ">"))
+                        (,(kbd "s"))   (,(kbd "S"))  (,(kbd "o"))
+                        (,(kbd "TAB")) (,(kbd "\"")) (,(kbd "!"))
+                        ))
+  (apply (alexandria:curry #'undefine-key *root-map*) default-bindings))
 #+END_SRC
+#+end_src
 *** *root-map* keybindings, aka prefixed ones (see prefix-key)
 #+BEGIN_SRC lisp
 (dolist
@@ -153,31 +132,32 @@
                 (,(kbd "s-b")     "windowlist")
                 (,(kbd "s")       "slynk")
                 (,(kbd "d")       "time")
-                (,(kbd "E")       "exec emacsclient -c")
-                (,(kbd "X")        "exec killall xmobar tiramisu && xmobar")
-                (,(kbd "RET")     "exec emacsclient -ce '(eshell)'")
-                (,(kbd "C-RET")   "exec emacsclient -ce '(+stumpish-vterm/here)'")
+                (,(kbd "e")       "exec emacsclient -c")
+                (,(kbd "E")       "emacs")
+                (,(kbd "C-e")     ,*emacs-application-keymap*)
+                (,(kbd "X")       "exec killall xmobar tiramisu && xmobar")
                 (,(kbd "s-h")     "move-window left")
                 (,(kbd "s-j")     "move-window down")
                 (,(kbd "s-k")     "move-window up")
                 (,(kbd "s-l")     "move-window right")
-                (,(kbd "C-e")      ,*emacs-application-keymap*)))
+                ))
   (apply (curry *root-map*) root-map))
 #+END_SRC
 *** *top-level* keybindings, aka with no prefix
 #+BEGIN_SRC lisp
-(dolist
-    (top-bindings `(
-                    (,(kbd "s-RET")     "exec emacsclient -ce '(+vterm/here \"~/\")'")
-                    (,(kbd "s-h")       "move-focus left")
-                    (,(kbd "s-j")       "move-focus down")
-                    (,(kbd "s-k")       "move-focus up")
-                    (,(kbd "s-l")       "move-focus right")
-                    (,(kbd "s-p")       "exec")
-                    (,(kbd "s-r")       "loadrc")
-                    (,(kbd "s-:")       "eval")
-                    (,(kbd "s-u")       "pass:pass-copy")))
-    (apply (curry *top-map*) top-bindings))
+  (dolist
+      (top-bindings `(
+  ;                    (,(kbd "s-RET")     "exec emacsclient -ce '(+vterm/here \"~/\")'")
+                      (,(kbd "s-RET")     "exec termonad")
+                      (,(kbd "s-h")       "move-focus left")
+                      (,(kbd "s-j")       "move-focus down")
+                      (,(kbd "s-k")       "move-focus up")
+                      (,(kbd "s-l")       "move-focus right")
+                      (,(kbd "s-p")       "exec")
+                      (,(kbd "s-r")       "loadrc")
+                      (,(kbd "s-:")       "eval")
+                      (,(kbd "s-u")       "pass:pass-copy")))
+      (apply (curry *top-map*) top-bindings))
 #+END_SRC
 ** initalization
 things that have to be ran on startup.
@@ -185,5 +165,6 @@ the dbus thing is a crutch.
 
 #+BEGIN_SRC lisp
 (when *initializing*
-  (run-shell-command "xmobar"))
+  (run-shell-command "xmobar")
+  (run-shell-command "sh ~/.fehbg"))
 #+END_SRC
