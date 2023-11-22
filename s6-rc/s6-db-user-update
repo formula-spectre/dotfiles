@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DATAPATH="${XDG_CONFIG_HOME}/s6u"
+DATAPATH="${XDG_CONFIG_HOME}/s6-rc"
 RCPATH="${DATAPATH}/rc"
 DBPATH="${RCPATH}/compiled"
 SVPATH="${DATAPATH}/sv"
@@ -18,7 +18,7 @@ if [ -e "/tmp/${USER}/s6-rc" ]; then
             s6-svc -x "${dir}"
         fi
     done
-    s6-rc-update -l "/tmp/s6-rc" "${DBPATH}"-"${TIMESTAMP}"
+    s6-rc-update -l "/tmp/${USER}/s6-rc" "${DBPATH}"-"${TIMESTAMP}"
 fi
 
 if [ -d "${DBPATH}" ]; then

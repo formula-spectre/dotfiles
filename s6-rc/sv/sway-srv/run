@@ -1,0 +1,16 @@
+#!/bin/execlineb -P
+fdmove -c 2 1
+backtick -E USER { id -un } s6-envdir /home/${USER}/.config/s6-rc/envdir
+unexport WAYLAND_DISPLAY
+multisubstitute
+{
+importas  HOME HOME
+importas UID UID
+
+}
+backtick -E SOCK { /run/user/${UID}/sway.sock }
+
+cd $HOME
+foreground { rm -f $SOCK }
+unexport ?
+sway

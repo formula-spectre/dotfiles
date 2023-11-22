@@ -1,0 +1,5 @@
+#!/bin/execlineb -P
+backtick -E USER { id -un } s6-envdir /home/${USER}/.config/s6-rc/envdir
+importas SWAYBG_BGDIR SWAYBG_BGDIR
+importas SWAYBG_BGMODE SWAYBG_BGMODE
+fdmove -c 2 1 /usr/bin/swaybg -m ${SWAYBG_BGMODE} -i ${SWAYBG_BGDIR}

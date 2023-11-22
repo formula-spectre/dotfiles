@@ -1,4 +1,4 @@
 #!/bin/execlineb -P
 backtick -E USER { id -un } s6-envdir /home/${USER}/.config/s6-rc/envdir
-importas DISPLAY DISPLAY
-fdmove -c 2 1 /usr/lib/libexec/kdeconnectd
+importas HOME HOME
+fdmove -c 2 1 /usr/bin/ssh-add ${HOME}/.ssh/id_rsa-homelab
