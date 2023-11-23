@@ -158,41 +158,31 @@ _i_: ibuffer
       (:desc "pass-Store-Copy-Field" "C-M-p" #'password-store-copy-field)
       (:desc "buffer management" "b" #'hydra-buffer/body)
       (:prefix-map ("t" . "toggle")
-                     (:prefix-map ("t" . "telega")
-                                  (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
-                                  ;(:desc "start telega"       "t" #'telega)
-                                  (:desc "telega chat with"   "c" #'telega-chat-with)
-                                  (:desc "kill telega"        "q" #'telega-kill)))
-
-      )
+       (:prefix-map ("t" . "telega")
+                    (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
+                                        ;(:desc "start telega"       "t" #'telega)
+                    (:desc "telega chat with"   "c" #'telega-chat-with)
+                    (:desc "kill telega"        "q" #'telega-kill))))
 
 (global-set-key (kbd "C-\\") #'undo)
 (global-set-key (kbd "M-:") #'eval-expression) ;just to enforce it. maybe not needed? TODO: investigate
 
-;FIXME!
- ;; (leaf telega
- ;;   :setq
- ;;   (telega-server-libs-prefix . "/usr")
- ;;   (telega-appindicator-use-labels . t)
- ;;   (telega-chat-input-markups . '("org" "markdown2"))
- ;;   (telega-directory . "~/.local/share/telega")
- ;;   (telega-emoji-font-family . "Iosevka Nerd Font")
- ;;   (telega-emoji-use-images . t)
- ;;   :hook
- ;;   ((telega-load-hook  .telega-notifications-mode)
- ;;    (telega-load-hook . telega-appindicator-mode)
- ;;    (telega-chat-mode-hook . toggle-truncate-lines)
- ;;    (telega-load-hook . telega-mode-line-mode)))
-(setq telega-server-libs-prefix "/usr")
-(add-hook 'telega-load-hook 'telega-notifications-mode)
-(add-hook 'telega-load-hook 'telega-appindicator-mode)
-(setq telega-appindicator-use-labels t)
+(leaf telega
+  :hook
+  ((telega-load-hook . telega-notifications-mode)
+   (telega-load-hook . telega-appindicator-mode)
+   (telega-load-hook . telega-mode-line-mode))
+  :setq
+  ((telega-server-libs-prefix . "/usr")
+   (telega-appindicator-use-labets . t)
+   (telega-chat-input-markups . '("org" "markdown2"))
+   (telega-emoji-font-family . "Iosevka Nerd Font")
+   (telega-emoji-use-images . t))
+  ;; :bind
+  ;; (:global-map
+  ;;  ("C-c t t" . telega-prefix-map))
+  )
 
-(setq telega-chat-input-markups '("org" "markdown2"))
-(setq telega-directory (concat (getenv "XDG_DATA_HOME") "/telega"))
-(setq telega-emoji-font-family "Iosevka Nerd Font")
-(setq telega-emoji-use-images t)
-;;(add-hook 'telega-chat-mode-hook 'toggle-truncate-lines 'visual-line-mode)
-(add-hook 'telega-load-hook 'telega-mode-line-mode)
-;;(add-hook 'telega-chats-fetched-hook (lambda () (telega-chatbuf--get-create (telega-chat-get "963417534"))))
+;; #FIXME! 
+(require 'telega)
 (define-key global-map (kbd "C-c t t") telega-prefix-map)
