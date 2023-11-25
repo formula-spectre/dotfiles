@@ -78,7 +78,8 @@
   :config
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist
-               '("m" . "src emacs-lisp")))
+               '("m" . "src emacs-lisp")
+               '("sw" "src conf-space")))
 
 (after! org-babel
     (add-to-list 'org-src-lang-modes '("sway" . sway-lang-mode)))
@@ -86,6 +87,8 @@
     (add-to-list 'org-src-lang-modes '("sway" . sway-mode)))
 
 (leaf ibuffer
+  :setq ((ibuffer-default-sorting-mode 'major-mode))
+  :hook ((ibuffer-mode-hook . ibuffer-auto-mode))
   :bind ("C-x b". ibuffer))
 
 (when (file-exists-p (concat (getenv "DOOMDIR") "/private.el"))
@@ -128,7 +131,13 @@
 (leaf ement
   :straight t
   :setq
-  (ement-save-sessions . t))
+  (ement-save-sessions . t)
+;  :config
+;  ((keymap-set ement-room-minibuffer-map "TAB" 'completion-at-point)))
+  )
+;; #FIXME!
+(require 'ement)
+(setq ement-save-sessions t)
 
 (defhydra hydra-modes ( :color pink :exit t)
   "various major modes"
@@ -158,11 +167,19 @@ _i_: ibuffer
       (:desc "pass-Store-Copy-Field" "C-M-p" #'password-store-copy-field)
       (:desc "buffer management" "b" #'hydra-buffer/body)
       (:prefix-map ("t" . "toggle")
-       (:prefix-map ("t" . "telega")
-                    (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
+                   (:prefix-map ("t" . "telega")
+                                (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
                                         ;(:desc "start telega"       "t" #'telega)
-                    (:desc "telega chat with"   "c" #'telega-chat-with)
-                    (:desc "kill telega"        "q" #'telega-kill))))
+                                (:desc "telega chat with"   "c" #'telega-chat-with)
+                                (:desc "kill telega"        "q" #'telega-kill)
+                                (:desc "pop telega rootbuf" "r" (lambda ()
+                                                                  (interactive)
+                                                                  (switch-to-buffer "*Telega Root*")))))
+      (:prefix-map ("e" . "eval")
+                   (:prefix-map ("e" . "ement")
+                                (:desc "start ement"    "e" #'ement-connect)
+                                (:desc "quit ement"     "q" #'ement-disconnect)))
+      )
 
 (global-set-key (kbd "C-\\") #'undo)
 (global-set-key (kbd "M-:") #'eval-expression) ;just to enforce it. maybe not needed? TODO: investigate
