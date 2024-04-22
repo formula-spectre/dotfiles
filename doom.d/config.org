@@ -20,8 +20,8 @@ any help is appreciated :)
 * theme emacs
 *** font
  #+BEGIN_SRC emacs-lisp
-(setq doom-font (font-spec :family "Iosevka Nerd Font" :size 14)
-      doom-variable-pitch-font (font-spec :family "Iosevka Nerd Font" :size 15))
+(setq doom-font (font-spec :family "LispMMonospace Nerd Font" :size 14)
+      doom-variable-pitch-font (font-spec :family "LispMMonospace Nerd Font" :size 15))
 #+END_SRC
 *** modeline
 #+BEGIN_SRC emacs-lisp
@@ -109,21 +109,35 @@ any help is appreciated :)
     :config
     (require 'org-tempo)
     (add-to-list 'org-structure-template-alist
-                 '("m" . "src emacs-lisp")))
-#+end_src
-** add sway-mode as codeblocks
-#+begin_src emacs-lisp
-(after! org-babel
-    (add-to-list 'org-src-lang-modes '("sway" . sway-lang-mode)))
-(after! org-babel
-    (add-to-list 'org-src-lang-modes '("sway" . sway-mode)))
-
+                 '("m" . "src emacs-lisp")
+                 '("sw" "src conf-space")))
 #+end_src
 * misc stuff
 *** ibuffer
 #+begin_src emacs-lisp
 (leaf ibuffer
+  :setq ((ibuffer-default-sorting-mode 'major-mode))
+  :hook ((ibuffer-mode-hook . ibuffer-auto-mode)
+         (ibuffer-mode-hook . (lambda ()
+                                (ibuffer-switch-to-saved-filter-groups "default"))))
   :bind ("C-x b". ibuffer))
+;;; TODO: put me in the leaf definition!
+(setq ibuffer-saved-filter-groups
+       (quote (("default"
+                ("ement" (name . "^\\*Ement"))
+                ("telega" (or
+                           (mode . telega-chat-mode)
+                           (mode . telega-root-mode )))
+                ("emacs" (or
+                          (name . "\\*scratch\\*")
+                          (name . "\\*Messages\\*")))
+                ("vterms" (mode . vterm-mode))
+                ("eat terminals" (mode . eat-mode))
+                ))))
+
+(add-hook 'ibuffer-mode-hook
+          (lambda ()
+            (ibuffer-switch-to-saved-filter-groups "default")))
 #+end_src
 *** Load private stuff
 #+BEGIN_SRC emacs-lisp
@@ -145,20 +159,25 @@ any help is appreciated :)
 #+END_SRC
 
 *** gentoo specific stuff (WIP)
-(when (string= (doom-system-distro) "gentoo")
-  (require 'portage)
-  (setq portage-full-upgrade-shmu-options '(:ask
-                                           :verbose
-                                           :update
-                                           :newuse
-                                           :deep
-                                           :complete-graph y
-                                           :with-bdeps y
-                                           :backtrack 50
-                                           :keep-going y
-                                           ))
-  (require 'magentoo))
+#+begin_src emacs-lisp
+(leaf sudo-edit
+  :custom ((sudo-edit-local-method . "sudo")))
 #+END_SRC
+#+begin_src emacs-lisp
+
+(require 'portage)
+(setq portage-full-upgrade-shmu-options '(:ask
+                                          :verbose
+                                          :update
+                                          :newuse
+                                          :deep
+                                          :complete-graph y
+                                          :with-bdeps y
+                                          :backtrack 50
+                                          :keep-going y
+                                          ))
+      (require 'magentoo)
+#+end_src
 
 *** TRAMP configuration
 #+BEGIN_SRC emacs-lisp
@@ -176,15 +195,20 @@ any help is appreciated :)
 #+END_SRC
 *** crux configuration
 #+begin_src emacs-lisp
-  (leaf crux
-    :straight t
-    :bind ("C-k" . crux-kill-whole-line))
-#+end_src
+   ;; (leaf crux
+   ;;  :straight t
+;;  :bind ("C-k" . crux-kill-whole-line))
+(setq kill-whole-line t)
 *** visual-regexp-steroids
 #+begin_src emacs-lisp
   (leaf visual-regexp-steroids
     :straight t
     :bind ([remap query-replace] . vr/replace))
+#+end_src
+
+#+begin_src emacs-lisp
+;;; FIXME!
+(define-key global-map (kbd "M-%") 'vr/replace)
 #+end_src
 *** ivy
 #+begin_src emacs-lisp
@@ -202,8 +226,100 @@ any help is appreciated :)
 (leaf ement
   :straight t
   :setq
-  (ement-save-sessions . t))
+  ((ement-save-sessions . t))
+;FIXME!
+;  :config
+;  ((keymap-set ement-room-minibuffer-map "TAB" . completion-at-point))
+)
+;; put us in the leaf definition!
+(require 'ement)
+(define-key ement-room-mode-map (kbd "e") 'ement-room-edit-message)
+(define-key ement-room-mode-map (kbd "r") 'ement-room-write-reply)
 #+end_src
+*** ednc
+#+begin_src emacs-lisp
+;;FIXME!
+(require 'ednc)
+ (defun stack-notifications (&optional hide)
+  (mapconcat (lambda (notification)
+               (let ((app-name (ednc-notification-app-name notification)))
+                 (unless (member app-name hide)
+                   (push app-name hide)
+                   (ednc-format-notification notification))))
+             (ednc-notifications) ""))
+(nconc global-mode-string '((:eval (stack-notifications))))
+(add-hook 'ednc-notification-presentation-functions
+          (lambda (&rest _) (force-mode-line-update t)))
+
+#+end_src
+*** woman configuration
+#+begin_src emacs-lisp
+(leaf woman
+  :setq (woman-path .'("/usr/share/gcc-data/x86_64-gentoo-linux-musl/12.2.0/man"
+                        "/usr/share/binutils-data/x86_64-gentoo-linux-musl/2.39/man"
+                        "/usr/local/share/man" "/usr/share/man" "/usr/lib/rust/man"
+                        "/usr/lib/llvm/17/share/man" "/usr/lib/llvm/16/share/man" "/opt/plan9/man"
+                        "/etc/eselect/wine/share/man")))
+#+end_src
+*** custom functions
+here I define some custom functions as to make my life easier
+- nchat :: just an eat buffer with nchat started
+  #+begin_src emacs-lisp
+(defun nchat ()
+  (interactive)
+  (setq eat-kill-buffer-on-exit t
+        eat-buffer-name "*nchat*")
+  (eat "nchat"))
+  #+end_src
+- vterm-wrapped :: so I can have vterm buffers with custom names
+  #+begin_src emacs-lisp
+(cl-defun vterm-wrapped (&key buffer-name)
+  "start vterm but with a custom buffer name"
+  (interactive)
+  (vterm buffer-name))
+  #+end_src
+- eat-wrapped :: ditto for ~vterm-wrapped~, but for eat
+  #+begin_src emacs-lisp
+(cl-defun eat-wrapped (&key buffer-name)
+  "start eat but with a custom buffer name"
+  (interactive)
+  (setq eat-kill-buffer-on-exit t
+        eat-buffer-name buffer-name)
+    (eat))
+  #+end_src
+- discordo :: a wrapper for the discordo TUI client using eat
+  #+begin_src emacs-lisp
+(defun discordo ()
+  (interactive)
+  (setq eat-kill-buffer-on-exit t
+        eat-buffer-name "*discordo*")
+  (eat "discordo"))
+  #+end_src
+- vi-yank-line :: a function to emulate vim's ~yy~
+  #+begin_src emacs-lisp
+(defun vi-yank-line (arg)
+  "Copy lines (as many as prefix argument) in the kill ring.
+      Ease of use features:
+      - Move to start of next line.
+      - Appends the copy on sequential calls.
+      - Use newline as last char even on the last line of the buffer.
+      - If region is active, copy its lines."
+  (interactive "p")
+  (let ((beg (line-beginning-position))
+        (end (line-end-position arg)))
+    (when mark-active
+      (if (> (point) (mark))
+          (setq beg (save-excursion (goto-char (mark)) (line-beginning-position)))
+        (setq end (save-excursion (goto-char (mark)) (line-end-position)))))
+    (if (eq last-command 'copy-line)
+        (kill-append (buffer-substring beg end) (< end beg))
+      (kill-ring-save beg end)))
+  (kill-append "\n" nil)
+  (beginning-of-line (or (and arg (1+ arg)) 2))
+  (if (and arg (not (= 1 arg))) (message "%d lines copied" arg)))
+
+#+end_src
+
 * keybindings
 **** here I define some keybindings
 ***** defining hydras
@@ -214,7 +330,9 @@ any help is appreciated :)
   ("t" text-mode "text mode")
   ("o" org-mode "org mode")
   ("w" writeroom-mode "writeroom mode")
-  ("e" emacs-lisp-mode "elisp mode")
+  ("g" god-mode "toggle god-mode")
+  ("l" lispy-mode "toggle lispy mode")
+  ("e" ednc-mode "toggle ednc mode")
   ("q" nil "quit"))
 #+END_SRC
 ****** hydra-buffer
@@ -225,33 +343,259 @@ any help is appreciated :)
 ^manage buffers^
 _c_: create buffer      _p_: prev buffer
 _k_: kill buffer        _n_: next buffer
-_i_: ibuffer
+_i_: ibuffer            _s_: switch to scratch buffer
 "
   ("c" +default/new-buffer)
   ("k" kill-this-buffer )
   ("n" next-buffer )
   ("p" previous-buffer)
+  ("s" (lambda () (interactive) (switch-to-buffer "*scratch*")))
   ("i" ibuffer))
 #+end_src
 **** here I use (map!)
 #+BEGIN_SRC emacs-lisp
 (map! :leader
-      (:desc "modes" "m" #'hydra-modes/body)
-      (:desc "pass-store-copy" "M-p" #'password-store-copy)
-      (:desc "pass-Store-Copy-Field" "C-M-p" #'password-store-copy-field)
       (:desc "buffer management" "b" #'hydra-buffer/body)
-      (:prefix-map ("t" . "toggle")
-       (:prefix-map ("t" . "telega")
-                    (:desc "start telega"       "t" (lambda () (interactive) (telega t)))
-                                        ;(:desc "start telega"       "t" #'telega)
-                    (:desc "telega chat with"   "c" #'telega-chat-with)
-                    (:desc "kill telega"        "q" #'telega-kill))))
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+                   (:desc "copy line vi-style" "y" #'vi-yank-line)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+                        (map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+                        (map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+(map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+                        (map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+                        (map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+                        (map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+        (map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
+(map! :leader
+      (:desc "buffer management" "b" #'hydra-buffer/body)
+      (:prefix-map ("SPC" . "Custom prefix")
+                   (:desc "modes" "m" #'hydra-modes/body)
+                   (:desc "set mark" "SPC" #'set-mark-command)
+
+                   (:prefix-map ("s" . "socials")
+                                (:desc "start nchat" "n" #'nchat)
+                                (:prefix-map ("t" . "telega")
+                                             (:desc "start telega" "t" (lambda () (interactive) (telega t)))
+                                             (:desc "chat with someone" "c" #'telega-chat-with)
+                                             (:desc "stop telega" "q" #'telega-kill)
+                                             (:desc "GOTO telega's rootbuf" "r" (lambda () (interactive) (switch-to-buffer "*Telega Root*")))
+                                             (:desc "filter by topic" "f" #'telega-chatbuf-filter-by-topic))
+
+                                (:prefix-map ("e" . "ement")
+                                             (:desc "start ement" "e" (lambda () (interactive) (ement-connect :uri-prefix "http://localhost:8008")))
+                                             (:desc "quit ement" "q" #'ement-disconnect)
+                                             (:desc "show rooms" "l" #'ement-list-rooms))
+                                )
+                   (:prefix-map ("p" . "password-store")
+                                (:desc "copy userfield" "u" #'password-store-copy-field)
+                                (:desc "copy password" "p" #'password-store-copy)
+                                (:desc "copy OTP for field" "o" #'password-store-otp-token-copy))
+                   (:prefix-map ("o" . "open")
+                                (:desc "open eat" "e" #'eat))))
 #+END_SRC
 
 **** Global Keys
 #+Begin_src emacs-lisp
 (global-set-key (kbd "C-\\") #'undo)
-(global-set-key (kbd "M-:") #'eval-expression) ;just to enforce it. maybe not needed? TODO: investigate
+(require 'vterm)
+(define-key vterm-mode-map (kbd "C-q") #'vterm-send-next-key)
 #+end_src
 * Telega configuration
  this some configuration for telega
@@ -264,16 +608,23 @@ _i_: ibuffer
   :setq
   ((telega-server-libs-prefix . "/usr")
    (telega-appindicator-use-labets . t)
+   ;; make it so the checkmark is on the same
+   (visual-fill-column-extra-text-width . '(0 . 4))
    (telega-chat-input-markups . '("org" "markdown2"))
-   (telega-emoji-font-family . "Iosevka Nerd Font")
+   (telega-emoji-font-family . "LispMMonospace Nerd Font")
    (telega-emoji-use-images . t))
   ;; :bind
   ;; (:global-map
   ;;  ("C-c t t" . telega-prefix-map))
   )
 
-;; #FIXME! 
+;; #FIXME!
 (require 'telega)
-(define-key global-map (kbd "C-c t t") telega-prefix-map)
+(define-key global-map (kbd "C-c SPC s  t") telega-prefix-map)
 
 #+END_SRC
+
+* after all this said and done, I need to write for readiness notification:
+#+begin_src emacs-lisp
+;; (add-hook 'after-init-hook (lambda () (shell-command "echo >&9")))
+#+end_src
